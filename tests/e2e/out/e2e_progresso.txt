@@ -1,0 +1,39 @@
+[1] OK Login com senha errada é recusado com mensagem
+[2] OK Colaborador entra e o menu mostra as 11 áreas
+[3] OK Colaborador não acessa a importação na tela
+[4] OK Colaborador chamando a função direto (fora da tela) é barrado pelo banco
+[5] OK Nenhuma importação gravada pelo colaborador
+[6] OK Sessão guardada só na aba (sessionStorage), não em localStorage
+[7] OK Admin cai direto na Importação Excel
+[8] OK Base vazia informada
+[9] OK Opção "complementar" desabilitada sem base
+[10] OK Arquivo que não é .xlsx bloqueado antes do envio
+[11] OK Coluna obrigatória ausente bloqueada antes do envio
+[12] OK Botão de importar desabilitado sem arquivo válido
+[13] OK Leitor do painel = conversor Python (openpyxl): Advbox-2026-10-24_0717524.xlsx — linhas e hash
+[14] OK Leitor do painel = conversor Python (openpyxl): Advbox-2026-10-24_0443625.xlsx — linhas e hash
+[15] OK Leitor do painel = conversor Python (openpyxl): Advbox-2026-10-24_0687502.xlsx — linhas e hash
+[16] OK Linha vazia no meio mantida (numeração), vazias no fim descartadas
+[17] OK Pré-conferência: 878 linhas, 31 concluídas, cria lote novo
+[18] OK Importação real concluída e gravada
+[19] OK Números da tela = números gravados no banco (novas/atualizadas/ignoradas/rejeitadas/sem vínculo)
+[20] OK Processos registrados = CNJs distintos válidos do arquivo
+[21] OK Tempo da importação de 878 linhas pela tela (2.5 s) abaixo de 60 s
+[22] OK Base atual atualizada após importar
+[23] OK Prévia alerta: só concluídas como nova fotografia
+[24] OK Banco pede confirmação e nada é gravado antes dela
+[25] OK Concluídas entraram no MESMO lote das pendentes
+[26] OK Visão atual = 878 + 50 linhas (fotografia do dia preservada)
+[27] OK 2º arquivo de concluídas complementando: 5 linhas repetidas ignoradas
+[28] OK Após os 3 arquivos reais: 418 processos (mesmo número da bateria do banco)
+[29] OK Mesmo arquivo de novo: avisado e nada alterado
+[30] OK Arquivo com erros: 2 rejeitadas de 4
+[31] OK Data da exportação do lote = data no nome do 1º arquivo do lote
+[32] OK Detalhe mostra o erro com o número da linha da planilha
+[33] OK Detalhe mostra avisos (CNJ fora do padrão, agenda após PF)
+[34] OK Linhas rejeitadas identificadas pelo número da planilha (3 e 4)
+[35] OK Linha vazia do meio rejeitada como linha 3 (numeração preservada)
+[36] OK Histórico lista todas as importações gravadas
+[37] OK Não há botão de excluir importação nem exportar CSV
+[38] OK Celular (390 px): sem rolagem horizontal da página
+[39] OK Sem erros no console do navegador (inclui violações de CSP)

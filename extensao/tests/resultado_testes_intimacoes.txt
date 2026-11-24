@@ -1,0 +1,24 @@
+OK    | Janela: órgão, CNJ do teor, data da publicação, captura                     | esperado: TJAL - 1ª VARA CÍVEL FICTÍCIA|0000101-95.2026.8.02 | obtido: TJAL - 1ª VARA CÍVEL FICTÍCIA|0000101-95.2026.8.02
+OK    | Janela: teor do órgão até o "Inteiro Teor" (sem a parte da IA)              | esperado: true|false|true | obtido: true|false|true
+OK    | Janela: link do inteiro teor e nome pesquisado                              | esperado: https://exemplo.invalid/teor/123?instancia=1|Advog | obtido: https://exemplo.invalid/teor/123?instancia=1|Advog
+OK    | Janela: processo vinculado                                                  | esperado: true | obtido: true
+OK    | Janela "N/A": "Nenhum processo vinculado" → vínculo falso, CNJ só pelo teor | esperado: false|0000102-80.2026.8.02.0001 | obtido: false|0000102-80.2026.8.02.0001
+OK    | Janela com estrutura desconhecida: erro explícito, nada inventado           | esperado: null|1 | obtido: null|1
+OK    | Lista: rodapé "1-2 de 5" → incompleta na tela                               | esperado: false|5|2 | obtido: false|5|2
+OK    | Lista: linha N/A sem processo e sem CNJ                                     | esperado: true|null | obtido: true|null
+OK    | Lista: período do filtro lido                                               | esperado: 05/10/2026|06/10/2026 | obtido: 05/10/2026|06/10/2026
+OK    | Registro: CNJ da lista ou, se ausente, do teor                              | esperado: 0000102-80.2026.8.02.0001 | obtido: 0000102-80.2026.8.02.0001
+OK    | Botão da controladoria aparece na tela de intimações                        | esperado: Registrar as intimações desta tela | obtido: Registrar as intimações desta tela
+OK    | Varredura: 3 intimações, total do rodapé 3, sem erros                       | esperado: 3|3|0 | obtido: 3|3|0
+OK    | Varredura: período do filtro                                                | esperado: 05/10/2026|06/10/2026|Hoje | obtido: 05/10/2026|06/10/2026|Hoje
+OK    | Intimação 1: CNJ, data, processo vinculado, teor                            | esperado: 0000101-95.2026.8.02.0001|06/10/2026|600000001|tru | obtido: 0000101-95.2026.8.02.0001|06/10/2026|600000001|tru
+OK    | Intimação "N/A": sem processo, CNJ vindo do teor                            | esperado: null|false|0000201-72.2026.8.13.0024 | obtido: null|false|0000201-72.2026.8.13.0024
+OK    | Token do formulário não é lido nem enviado                                  | esperado: false | obtido: false
+OK    | Somente pedidos GET ao ADVBOX (nenhum clique, envio ou alteração)           | esperado: true | obtido: true
+OK    | Resultado mostrado na tela                                                  | esperado: true | obtido: true
+OK    | Tela paginada (3 de 84): varredura enviada com erro de incompletude         | esperado: true | obtido: true
+OK    | Tela paginada: aviso "INCOMPLETA" ao usuário                                | esperado: true | obtido: true
+OK    | Intimação já conhecida no banco: janela não é aberta de novo                | esperado: false|true | obtido: false|true
+OK    | Recusa do ADVBOX (HTTP 413): varredura interrompida e marcada com erro      | esperado: true|3 | obtido: true|3
+
+22/22 OK — 18/11/2026, 13:54:53

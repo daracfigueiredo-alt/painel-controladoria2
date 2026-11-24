@@ -1,0 +1,66 @@
+OK    | CNJ: só dígitos -> formato padrão                                                                     | esperado: 0000001-87.2026.8.05.0024 | obtido: 0000001-87.2026.8.05.0024
+OK    | CNJ: espaços e pontuação extra                                                                        | esperado: 0000001-87.2026.8.05.0024 | obtido: 0000001-87.2026.8.05.0024
+OK    | CNJ: menos de 20 dígitos -> nulo                                                                      | esperado:  | obtido: 
+OK    | CNJ: dígito verificador correto (cálculo independente em Python)                                      | esperado: t | obtido: t
+OK    | CNJ: dígito verificador errado detectado                                                              | esperado: f | obtido: f
+OK    | CNJ: foro (OOOO) extraído                                                                             | esperado: 0702 | obtido: 0702
+OK    | Importação registra processos (3 CNJs distintos)                                                      | esperado: 3|3 | obtido: 3|3
+OK    | Processo: tribunal e foro derivados do CNJ                                                            | esperado: 8.05|0702|true | obtido: 8.05|0702|true
+OK    | Colaborador vê só processos das próprias tarefas                                                      | esperado: 2 | obtido: 2
+OK    | Colaborador não cadastra feriado                                                                      | esperado: negado | obtido: negado
+OK    | Feriado sem fundamento é recusado                                                                     | esperado: recusado | obtido: recusado
+OK    | D-4 com feriado MUNICIPAL do foro (PF 03/11; 02/11 Finados; 28/10 no foro)                            | esperado: 2026-10-27 | obtido: 2026-10-27
+OK    | Mesmo tribunal, outro foro: feriado municipal não se aplica                                           | esperado: 2026-10-28 | obtido: 2026-10-28
+OK    | Função de 2 argumentos mantida (compatibilidade)                                                      | esperado: 2026-10-28 | obtido: 2026-10-28
+OK    | Painel aplica o foro do CNJ ao D-4                                                                    | esperado: 2026-10-27|2026-10-28 | obtido: 2026-10-27|2026-10-28
+OK    | Cadastro de feriado auditado                                                                          | esperado: 1 | obtido: 1
+OK    | Abrangência foro exige código de 4 dígitos                                                            | esperado: recusado | obtido: recusado
+OK    | Colaborador não define equipe                                                                         | esperado: negado | obtido: negado
+OK    | Equipe definida e auditada                                                                            | esperado: TESTE EQUIPE BANCÁRIO|1 | obtido: TESTE EQUIPE BANCÁRIO|1
+OK    | Equipe disponível no painel (filtro)                                                                  | esperado: t | obtido: t
+OK    | Publicação nova registrada                                                                            | esperado: nova|t | obtido: nova|t
+OK    | Mesma publicação, mesma fonte: não duplica                                                            | esperado: ja_registrada|False | obtido: ja_registrada|False
+OK    | Mesma publicação pelo Gmail (CNJ sem pontuação, teor com espaços/maiúsculas): 1 publicação, 2 coletas | esperado: ja_registrada|1|2 | obtido: ja_registrada|1|2
+OK    | Publicação diferente, mesmo processo e data: NÃO é eliminada                                          | esperado: nova|2 | obtido: nova|2
+OK    | Teor integral preservado sem alteração                                                                | esperado: t | obtido: t
+OK    | Publicação sem teor: rejeitada, com log e evento de erro                                              | esperado: rejeitada|1|1 | obtido: rejeitada|1|1
+OK    | Colaborador não registra publicação                                                                   | esperado: negado | obtido: negado
+OK    | Colaborador não lê publicações                                                                        | esperado: 0 | obtido: 0
+OK    | Publicação é imutável                                                                                 | esperado: bloqueado | obtido: bloqueado
+OK    | 'Encontrada' sem a publicação específica no ADVBOX é recusada                                         | esperado: recusado | obtido: recusado
+OK    | Erro de acesso exige descrição do erro                                                                | esperado: recusado | obtido: recusado
+OK    | Erro de acesso e inconclusiva NÃO preparam tarefa                                                     | esperado: 0 | obtido: 0
+OK    | Ausente no ADVBOX prepara tarefa de análise                                                           | esperado: preparada | obtido: preparada
+OK    | Observações começam com a origem WEBJUR e a data                                                      | esperado: True | obtido: True
+OK    | Observações trazem número, tribunal, órgão e o TEOR INTEGRAL                                          | esperado: True | obtido: True
+OK    | Responsável e tipo da tarefa                                                                          | esperado: Mayra Gomes|análise do caso | obtido: Mayra Gomes|análise do caso
+OK    | Tarefa vinculada ao processo                                                                          | esperado: t | obtido: t
+OK    | Nova conferência da mesma publicação NÃO cria 2ª tarefa                                               | esperado: None|1|1 | obtido: None|1|1
+OK    | Processo não cadastrado: sem vínculo inventado, marcada para cadastro                                 | esperado: true||true | obtido: true||true
+OK    | Colaborador não aprova                                                                                | esperado: negado | obtido: negado
+OK    | Criação antes da aprovação é recusada                                                                 | esperado: recusado | obtido: recusado
+OK    | Rejeição sem motivo é recusada                                                                        | esperado: recusado | obtido: recusado
+OK    | Início da criação devolve o conteúdo a lançar                                                         | esperado: Mayra Gomes|análise do caso|True | obtido: Mayra Gomes|análise do caso|True
+OK    | Segunda tentativa de criação (extensão reaberta) é recusada                                           | esperado: recusado | obtido: recusado
+OK    | Falha incerta -> verificar no ADVBOX antes de recriar                                                 | esperado: verificar_no_advbox|recusado | obtido: verificar_no_advbox|recusado
+OK    | Confirmação com o ID da tarefa criada                                                                 | esperado: criada|888001 | obtido: criada|888001
+OK    | Tarefa criada não volta a ser criada                                                                  | esperado: recusado | obtido: recusado
+OK    | Histórico completo da tarefa de análise                                                               | esperado: preparada>aprovada>criacao_em_andamento>verificar_no_advbox>criada | obtido: preparada>aprovada>criacao_em_andamento>verificar_no_advbox>criada
+OK    | Histórico é imutável                                                                                  | esperado: bloqueado | obtido: bloqueado
+OK    | Decisões registradas na auditoria geral                                                               | esperado: 4 | obtido: 4
+OK    | Aprovação recusada se a última conferência encontrou a publicação                                     | esperado: recusado | obtido: recusado
+OK    | Marcada como já tratada                                                                               | esperado: ja_tratada | obtido: ja_tratada
+OK    | Relatório diário: recebidas/com conferência/encontradas/ausentes/não cadastrado                       | esperado: 6|5|2|1|0 | obtido: 6|5|2|1|0
+OK    | Relatório diário: inconclusivas/erros/aprovadas/criadas                                               | esperado: 1|1|1|1 | obtido: 1|1|1|1
+OK    | % ausentes só sobre conferidas efetivas (1 de 3), sem erros e inconclusivas                           | esperado: 33.3 | obtido: 33.3
+OK    | Colaborador grava log de integração                                                                   | esperado: ok | obtido: ok
+OK    | Colaborador não lê o log                                                                              | esperado: 0 | obtido: 0
+OK    | Há alerta de PF Judicial vencido para conferir (fixture)                                              | esperado: True | obtido: True
+OK    | Nota curta demais na conferência do alerta é recusada                                                 | esperado: recusado | obtido: recusado
+OK    | Alerta conferido aparece como conferido; os demais seguem pendentes                                   | esperado: conferido|providencia_em_outra_tarefa|true | obtido: conferido|providencia_em_outra_tarefa|true
+OK    | Anônimo não executa funções da Webjur                                                                 | esperado: negado | obtido: negado
+OK    | Anônimo não lê nenhuma tabela nova                                                                    | esperado: 9 | obtido: 9
+OK    | Colaborador não grava direto nas tabelas novas                                                        | esperado: 9 | obtido: 9
+OK    | Funções internas não expostas ao usuário                                                              | esperado: negado | obtido: negado
+
+64/64 OK — executado em 06/11/2026 10:27

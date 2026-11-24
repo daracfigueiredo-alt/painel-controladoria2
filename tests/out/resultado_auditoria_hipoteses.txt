@@ -1,0 +1,18 @@
+ACHADO | H1 Tarefa recorrente realocada após início da tratativa           | requisito: início registrado pela extensão continua associado à tarefa após reimportação
+       |                                                                   | observado: vínculo lote1=excel_unico; lote2 tarefas_novas=1; início na visão atual=NULO
+ACHADO | H1b Reabrir a tarefa na extensão após a reimportação              | requisito: extensão e painel apontam para a mesma tarefa
+       |                                                                   | observado: extensão mostra início=True (tarefa_id 1); painel mostra início=NULO
+ACHADO | H2 Tarefa vista pela extensão antes de aparecer no Excel          | requisito: uma única tarefa; início visível no painel
+       |                                                                   | observado: vínculo inicial=sem_correspondencia; registros de tarefa=2; início na visão atual=NULO
+ACHADO | H3 Início registrado pelo admin, visto pelo responsável           | requisito: o responsável enxerga o mesmo início que o admin
+       |                                                                   | observado: admin vê=sim; responsável vê=não
+DECIDIR| H4 Colaborador consulta tarefa de outro responsável pela extensão | requisito: acesso limitado às próprias tarefas (Prompt Mestre §5) — ou regra explícita do escritório
+       |                                                                   | observado: colaborador B recebeu status (início=True, PF judicial=None)
+ACHADO | H5 Conclusão 'permitida' em tarefa SEM início                     | requisito: servidor recusa ou reclassifica
+       |                                                                   | observado: aceito=True
+ACHADO | H6 Privilégio de execução para anon                               | requisito: anon não executa nenhuma função
+       |                                                                   | observado: _dt_tela=true, _ts_tela=true, ext_status_tarefa=false, importar_arquivo=false, is_admin=false
+ACHADO | H7 Arquivo de concluídas importado como lote novo por engano      | requisito: a fotografia atual não deve ser substituída por um arquivo parcial sem aviso
+       |                                                                   | observado: tarefas na visão atual: antes=4, depois=1
+
+0 conformes, 7 achados, 1 a decidir, de 8 verificações

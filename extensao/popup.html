@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<style>
+  body{font:13px/1.4 system-ui,sans-serif;width:280px;margin:12px;color:#111}
+  h1{font-size:14px;margin:0 0 8px}
+  input{width:100%;box-sizing:border-box;margin:4px 0;padding:6px}
+  button{padding:6px 10px;margin-top:6px}
+  .muted{color:#555;font-size:12px}
+  .erro{color:#b91c1c}
+</style>
+</head>
+<body>
+  <h1>Controladoria — ADVBOX (teste)</h1>
+  <div id="estado" class="muted">Carregando…</div>
+  <form id="login" hidden>
+    <input id="email" type="email" placeholder="E-mail da controladoria" autocomplete="username" required>
+    <input id="senha" type="password" placeholder="Senha" autocomplete="current-password" required>
+    <button type="submit">Entrar</button>
+    <p class="muted">Conta do sistema da controladoria (Supabase), não a do ADVBOX. A senha não é armazenada.</p>
+  </form>
+  <div id="analise" hidden>
+    <p id="analise-estado" class="muted"></p>
+    <label class="muted"><input type="checkbox" id="pausar" style="width:auto"> Pausar a criação automática de tarefas de análise</label>
+    <button id="criar-agora">Criar as aprovadas agora (aba do ADVBOX)</button>
+  </div>
+  <button id="sair" hidden>Sair</button>
+  <p id="msg" class="erro"></p>
+  <script src="popup.js"></script>
+</body>
+</html>

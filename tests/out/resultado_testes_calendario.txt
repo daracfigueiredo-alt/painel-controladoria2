@@ -1,0 +1,15 @@
+OK    | Total de dias cadastrados para os 4 tribunais                                | esperado: 92 | obtido: 92
+OK    | Carga repetida não duplica (idempotente)                                     | esperado: 92 | obtido: 92
+OK    | Todo registro tem fundamento                                                 | esperado: 0 | obtido: 0
+OK    | Nenhum feriado nacional repetido no nível do tribunal                        | esperado: 0 | obtido: 0
+OK    | D-4 TJMG BH: PF 10/12/2026 (7/12 sem expediente, 8/12 Dia da Justiça)        | esperado: 2026-12-03 | obtido: 2026-12-03
+OK    | D-4 TJMG: PF 03/11/2026 (30/10 Dia do Funcionário Público, 2/11 Finados)     | esperado: 2026-10-27 | obtido: 2026-10-27
+OK    | D-4 TJPR: PF 10/12/2026 (8/12 NÃO é feriado no TJPR; transferido para 18/12) | esperado: 2026-12-07 | obtido: 2026-12-07
+OK    | D-4 TJPR Curitiba 0001: PF 10/09/2026 (8/9 padroeira; 7/9 Independência)     | esperado: 2026-09-03 | obtido: 2026-09-03
+OK    | D-4 TJPR outro foro: PF 10/09/2026 (só 7/9)                                  | esperado: 2026-09-04 | obtido: 2026-09-04
+OK    | D-4 TJSP: PF 30/10/2026 (28/10 Dia do Servidor)                              | esperado: 2026-10-26 | obtido: 2026-10-26
+OK    | D-4 TJGO: PF 30/10/2026 (28/10 Dia do Servidor)                              | esperado: 2026-10-26 | obtido: 2026-10-26
+OK    | D-4 TJGO: ponto facultativo (5/6) conta como dia útil                        | esperado: 2026-06-03 | obtido: 2026-06-03
+OK    | D-4 Tribunal sem calendário cadastrado: só nacionais                         | esperado: 2026-10-27 | obtido: 2026-10-27
+
+13/13 OK — executado em 06/11/2026 10:27

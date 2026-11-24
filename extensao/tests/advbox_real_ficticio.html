@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><title>ADVBOX — réplica FICTÍCIA da estrutura real (06/11/2026)</title>
+<style> body{font:14px sans-serif} .header a, .header i, .body > p > i {display:block} .task-container{border:1px solid #999;padding:8px;margin-top:8px} /* como no ADVBOX real (07/11/2026): modal fixo */ .modal-container{position:fixed;top:0;right:0;width:60%;max-height:100%;overflow:auto;background:#fff} p{margin:2px 0} </style></head>
+<body>
+<!-- Estrutura copiada da tela REAL do ADVBOX em 06/11/2026 (classes, atributos e ordem dos rótulos).
+     Todo o CONTEÚDO é fictício. Os handlers abaixo imitam o ADVBOX: jQuery delegado no documento. -->
+<div class="row data multiple-tables posts">
+  <table class="dataTable hover clickable no-header custom dashboard--group" data-group="deadline"><tbody>
+    <tr class="late"><td>
+      <a href="posts/status/900000002" class="icon icon-dashboard change-status apply_ia" data-field="completed" data-value="1" data-id="800000002" data-lawsuit="1" data-task="1" data-post="900000002" title="Resolvido"><i class="material-icons completed-false">lens</i></a>
+      <a href="posts/status/900000002" class="icon icon-dashboard change-status" data-field="important" data-value="1" data-id="800000002" title="Importante">star</a>
+    </td><td><a href="posts/900000002/edit" class="link autoread show-event click-row ellipsis">MANIFESTAÇÃO SIMPLES: TF - 05/11 - texto fictício da tarefa da lista</a></td></tr>
+    <tr><td>
+      <a href="posts/status/900000003" class="icon icon-dashboard change-status apply_ia" data-field="completed" data-value="1" data-id="800000003" data-post="900000003" title="Resolvido"><i class="material-icons completed-false">lens</i></a>
+    </td><td><a href="posts/900000003/edit" class="link autoread show-event click-row ellipsis">PROTOCOLO: TF - tarefa fictícia já iniciada</a></td></tr>
+  </tbody></table>
+  <table class="dataTable hover clickable no-header custom dashboard--group" data-group="publication"><tbody>
+    <tr><td><a href="posts/status/900000009" class="icon icon-dashboard change-status apply_ia" data-field="completed" data-value="1" data-id="800000009" data-post="900000009" title="Resolvido"><i class="material-icons">lens</i></a></td>
+    <td><a href="posts/900000009/edit" class="link autoread show-event click-row ellipsis">INTIMAÇÃO JUDICIAL</a></td></tr>
+  </tbody></table>
+</div>
+
+<div class="modal-container task-container">
+  <div class="header">
+    <a href="javascript: void(0);" data-id="900000001" data-user="1" class="button toggle"><i class="material-icons">done</i> Concluir</a>
+    <a class="item"><i class="material-icons">share</i> Copiar link</a>
+    <a href="posts/create" class="item add-new-message"><i class="material-icons">edit</i> Editar</a>
+    <a href="posts/900000001" data-id="900000001" class="item delete header"><i class="material-icons">delete</i> Excluir</a>
+  </div>
+  <div class="body">
+    <p><i class="material-icons">clear</i></p>
+    <h3>Análise do Caso</h3><p>50pts</p>
+    <p class="description">TF - 19/10 - Prazo 15 dias. PF: 27/10.<br>Texto fictício da descrição.</p>
+    <div class="task-item"><p class="task-item-label">Responsável</p>
+      <ul class="task-item-users list-users"><li class="user-296462" title="Pessoa Fictícia Um: Pendente"><img alt=""><div class="lens"></div></li></ul></div>
+    <p class="label">Situação</p><p>Pendente (1)</p>
+    <p class="label">Data do evento</p><p><i class="material-icons">today</i></p><p>segunda, 19/10/2026 (O dia inteiro)</p>
+    <p class="label">Prazo fatal</p><p><i class="material-icons">today</i></p><p>terça, 27/10/2026</p>
+    <p class="label">Criado por</p><p>Pessoa Fictícia Dois</p><p>16/10/2026 09:15 (8 dias atrás)</p>
+    <p class="label">Processo</p><p>0000001-00.2026.8.13.0001 <span class="material-icons">content_copy</span></p><p>Visualizar processo</p>
+    <p class="label">Partes envolvidas</p><p>T001 - Cliente Fictício Ltda</p><p>T001 - Banco Fictício S.A.</p>
+    <p class="label">Grupo de ação</p><p>Bancário</p>
+  </div>
+
+  <!-- "Editar tarefa": ALTERA a tarefa (campos preenchidos; editing = ID) -->
+  <form method="POST" action="https://app.advbox.com.br/posts" class="modal-inner-create create">
+    <input type="hidden" name="_token" value="NAO-DEVE-SER-LIDO">
+    <input type="hidden" name="guests[]" value="296462">
+    <select name="user"><option value=""></option><option value="296463">Pessoa Fictícia Três</option></select>
+    <select name="tasks_id"><option value="1" selected>ANÁLISE DO CASO (50 pts)</option></select>
+    <input type="text" name="date" value="19/10/2026" placeholder="__/__/____">
+    <div class="calendario"><button class="dia" onclick="event.preventDefault()">21</button></div><!-- dia do calendário: <button> sem type (ADVBOX real) -->
+    <input type="text" name="hour" value="" placeholder="__:__">
+    <input type="text" name="date_deadline" value="27/10/2026" placeholder="__/__/____">
+    <textarea name="comments">TF - 19/10 - Prazo 15 dias. PF: 27/10.</textarea>
+    <input type="hidden" name="create" value="1"><input type="hidden" name="editing" value="900000001">
+    <div class="botoes"><button type="submit" class="btn-primary">Editar tarefa</button><button type="button">Cancelar</button></div>
+  </form>
+
+  <!-- "Atribuir tarefa": CRIA tarefa nova (campos vazios) -->
+  <form method="POST" action="https://app.advbox.com.br/posts" class="modal-body-comment answer">
+    <input type="hidden" name="_token" value="NAO-DEVE-SER-LIDO">
+    <select name="user"><option value=""></option><option value="296463">Pessoa Fictícia Três</option></select>
+    <select name="tasks_id"><option value=""></option><option value="2">PROTOCOLO</option></select>
+    <textarea name="comments" placeholder="Adicione um comentário para você."></textarea>
+    <input type="text" name="date" placeholder="Data"><input type="text" name="hour" placeholder="Hora"><input type="text" name="date_deadline" placeholder="Prazo fatal">
+    <input type="hidden" name="lawsuits_id" value="1">
+    <button type="submit" class="btn-primary">Atribuir tarefa</button>
+  </form>
+
+  <!-- "Encaminhar" -->
+  <form method="POST" action="https://app.advbox.com.br/post-events" class="form-publication form-event">
+    <input type="hidden" name="_token" value="NAO-DEVE-SER-LIDO">
+    <select name="user"><option value=""></option><option value="296463" selected>Pessoa Fictícia Três</option></select>
+    <input type="hidden" name="post_id" value="900000001">
+    <button type="submit">Encaminhar</button>
+  </form>
+</div>
+
+<script src="jquery.min.js"></script>
+<script>
+  // Imitação do ADVBOX: handlers delegados no documento (registrados antes da extensão)
+  window.__concluido = 0; window.__listaConcluida = []; window.__editado = null; window.__atribuido = null; window.__encaminhado = null;
+  $(document).on('click', '.task-container a.toggle', function (e) { e.preventDefault(); window.__concluido++; });
+  $(document).on('click', 'a.change-status', function (e) { e.preventDefault(); if ($(this).data('field') === 'completed') window.__listaConcluida.push(String($(this).data('post'))); });
+  const dados = f => Object.fromEntries([...new FormData(f)].filter(([k]) => k !== '_token'));
+  $(document).on('submit', 'form.modal-inner-create', function (e) { e.preventDefault(); window.__editado = dados(this); });
+  $(document).on('submit', 'form.modal-body-comment', function (e) { e.preventDefault(); window.__atribuido = dados(this); });
+  $(document).on('submit', 'form.form-event', function (e) { e.preventDefault(); window.__encaminhado = dados(this); });
+</script>
+</body></html>

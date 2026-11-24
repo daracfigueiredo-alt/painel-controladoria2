@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self' https://*.supabase.co; base-uri 'none'; form-action 'none'">
+<title>Controladoria Jurídica — Oliveira e Camilo</title>
+<link rel="icon" type="image/png" sizes="32x32" href="img/icone-32.png">
+<link rel="icon" type="image/png" sizes="64x64" href="img/icone-64.png">
+<link rel="apple-touch-icon" href="img/icone-180.png">
+<meta name="theme-color" content="#323232">
+<link rel="stylesheet" href="css/painel.css">
+</head>
+<body>
+  <header class="topo">
+    <div class="marca"><img class="marca-logo" src="img/logo-topo.png" alt="Oliveira &amp; Camilo — Gestão Jurídica e Estratégica" width="136" height="48"><span class="marca-nome">Controladoria Jurídica</span></div>
+    <div class="sessao" id="sessao" hidden>
+      <span id="sessao-usuario"></span>
+      <span class="papel" id="sessao-papel"></span>
+      <button type="button" class="btn btn-sec btn-peq" id="btn-sair">Sair</button>
+    </div>
+  </header>
+
+  <main id="tela-login" class="login" hidden>
+    <img class="login-logo" src="img/logo.png" alt="Oliveira &amp; Camilo — Gestão Jurídica e Estratégica" width="380" height="134">
+    <form id="form-login" class="cartao login-cartao" novalidate>
+      <h1>Entrar</h1>
+      <p class="sutil">Conta do sistema da controladoria (não é a senha do ADVBOX).</p>
+      <label>E-mail<input id="login-email" type="email" autocomplete="username" required></label>
+      <label>Senha<input id="login-senha" type="password" autocomplete="current-password" required></label>
+      <button type="submit" class="btn" id="btn-entrar">Entrar</button>
+      <p class="erro" id="login-erro" role="alert"></p>
+    </form>
+  </main>
+
+  <div id="tela-app" class="app" hidden>
+    <nav class="menu" id="menu" aria-label="Áreas do painel"></nav>
+    <section class="conteudo" id="conteudo" tabindex="-1"></section>
+  </div>
+
+  <p class="config-erro" id="config-erro" hidden>Painel sem configuração do Supabase. Preencha <code>js/config.js</code> com a URL do projeto e a chave publicável.</p>
+
+  <script src="vendor/supabase-2.118.0.js"></script>
+  <script src="vendor/fflate-0.8.3.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/xlsx_leitor.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/comum.js"></script>
+  <script src="js/importacao.js"></script>
+  <script src="js/indicadores.js"></script>
+  <script src="js/riscos.js"></script>
+  <script src="js/webjur_email.js"></script>
+  <script src="js/webjur_portal.js"></script>
+  <script src="js/publicacoes.js"></script>
+  <script src="js/doublecheck.js"></script>
+  <script src="js/analise.js"></script>
+  <script src="js/auditoria.js"></script>
+  <script src="js/configuracoes.js"></script>
+  <script src="js/gestao.js"></script>
+  <script src="js/cnj.js"></script>
+  <script src="js/cadastro_atlas.js"></script>
+  <script src="js/audiencias.js"></script>
+  <script src="js/relatorios.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

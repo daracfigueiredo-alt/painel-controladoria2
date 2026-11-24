@@ -1,0 +1,33 @@
+OK    | Visão geral: 12 cartões (7 de posição, 5 do período)                                       | esperado: 12 | obtido: 12
+OK    | Cartões da tela = números calculados pelo banco (11 indicadores)                           | esperado: iguais | obtido: iguais
+OK    | Valores conhecidos da base fictícia aparecem na tela                                       | esperado: 7|2|1|1|1|2|1|3 | obtido: 7|2|1|1|1|2|1|3
+OK    | Aviso de atualização da base exibido                                                       | esperado: true | obtido: true
+OK    | Detalhamento do cartão "Vencidas" lista exatamente os registros do número                  | esperado: 2 | obtido: 2
+OK    | Detalhamento explica por que cada registro está ali                                        | esperado: true | obtido: true
+OK    | Gráfico 1 tem um alvo por dia do período (30) + 1 grupo por colaborador                    | esperado: 32 | obtido: 32
+OK    | Soma das barras de concluídas por dia = cartão Concluídas                                  | esperado: 2 | obtido: 2
+OK    | Gráfico tem alternativa em tabela                                                          | esperado: 30 | obtido: 30
+OK    | Legenda do gráfico de 2 séries presente                                                    | esperado: Concluídas no período|Pendentes (posição atual) | obtido: Concluídas no período|Pendentes (posição atual)
+OK    | Filtro "Últimos 90 dias" inclui a conclusão de 40 dias atrás                               | esperado: 3 | obtido: 3
+OK    | Filtro por equipe atualiza os cartões (pendentes da equipe 1 = 5)                          | esperado: 5 | obtido: 5
+OK    | Indicadores por colaborador: uma linha por colaborador com tarefas                         | esperado: 2 | obtido: 2
+OK    | Linha do colaborador A = banco (pendentes, vencidas, protocolos, tempo médio ~30 h)        | esperado: true | obtido: true
+OK    | Número do colaborador abre o detalhamento filtrado por ele                                 | esperado: true | obtido: true
+OK    | Prazos em risco: total da tela = banco (pendentes de conferência)                          | esperado: Todos (20) | obtido: Todos (20)
+OK    | Criticidade exibida com ícone e rótulo (não só cor)                                        | esperado: true | obtido: true
+OK    | Filtro por tipo de alerta                                                                  | esperado: 1 | obtido: 1
+OK    | Conferência com nota curta é recusada pelo banco e explicada                               | esperado: true | obtido: true
+OK    | Conferência gravada e alerta sai da lista de pendentes                                     | esperado: conferido|0 | obtido: conferido|0
+OK    | Após a conferência, a lista volta para todos os alertas pendentes                          | esperado: Todos (19) | obtido: Todos (19)
+OK    | Reagendamentos: solicitação e efetivação separadas                                         | esperado: true | obtido: true
+OK    | Aviso: aprovação/rejeição não identificáveis na exportação                                 | esperado: true | obtido: true
+OK    | Texto original do pedido exibido                                                           | esperado: true | obtido: true
+OK    | Tratativa: pendentes sem início = banco                                                    | esperado: Pendente sem início (6) | obtido: Pendente sem início (6)
+OK    | Tratativa: concluídas sem início (inconsistência) aparecem após configurar o monitoramento | esperado: true | obtido: true
+OK    | Tarefa iniciada mostra quem iniciou                                                        | esperado: true | obtido: true
+OK    | Colaborador A vê os próprios números (pendentes = 5)                                       | esperado: 5 | obtido: 5
+OK    | Colaborador não vê filtros de equipe/colaborador                                           | esperado: 0 | obtido: 0
+OK    | Celular (390 px): sem rolagem horizontal na Visão geral                                    | esperado: true | obtido: true
+OK    | Sem erros inesperados (console e respostas HTTP)                                           | esperado:  | obtido: 
+
+31/31 OK — executado em 06/11/2026, 10:27:31

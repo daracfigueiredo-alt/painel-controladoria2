@@ -1,0 +1,43 @@
+OK    | Indicador 'pendentes' com resposta conhecida                                                    | esperado: 7 | obtido: 7
+OK    | Indicador 'vencidas' com resposta conhecida                                                     | esperado: 2 | obtido: 2
+OK    | Indicador 'pf_judicial_vencido_conferir' com resposta conhecida                                 | esperado: 1 | obtido: 1
+OK    | Indicador 'vencem_hoje' com resposta conhecida                                                  | esperado: 1 | obtido: 1
+OK    | Indicador 'd4_criticas' com resposta conhecida                                                  | esperado: 1 | obtido: 1
+OK    | Indicador 'sem_inicio' com resposta conhecida                                                   | esperado: 7 | obtido: 7
+OK    | Indicador 'concluidas' com resposta conhecida                                                   | esperado: 2 | obtido: 2
+OK    | Indicador 'protocolos_realizados' com resposta conhecida                                        | esperado: 1 | obtido: 1
+OK    | Indicador 'distribuicoes_realizadas' com resposta conhecida                                     | esperado: 1 | obtido: 1
+OK    | Indicador 'pedidos_reagendamento' com resposta conhecida                                        | esperado: 1 | obtido: 1
+OK    | Indicador 'reagendamentos_efetivados' com resposta conhecida                                    | esperado: 3 | obtido: 3
+OK    | Concluída há 40 dias fica fora do período de 30 dias                                            | esperado: 0 | obtido: 0
+OK    | Período maior inclui a conclusão antiga                                                         | esperado: 3 | obtido: 3
+OK    | Solicitação NÃO é contada como reagendamento efetivado (e vice-versa)                           | esperado: 1|3 | obtido: 1|3
+OK    | PF Judicial vencido aparece como pendência de conferência, com o texto explícito                | esperado: t | obtido: t
+OK    | Cartões = contagem do detalhamento (todos os indicadores)                                       | esperado: True | obtido: True
+OK    | Soma por colaborador = total do cartão (todos os indicadores)                                   | esperado: True | obtido: True
+OK    | Gráfico de concluídas por dia soma o cartão; 1 ponto por dia do período                         | esperado: 2|31 | obtido: 2|31
+OK    | Filtro por equipe 1 (só colaborador A)                                                          | esperado: 5|1|0 | obtido: 5|1|0
+OK    | Filtro por colaborador B                                                                        | esperado: 2|1 | obtido: 2|1
+OK    | Colaborador A vê só os próprios números                                                         | esperado: 5|1|0 | obtido: 5|1|0
+OK    | Colaborador A não vê registros de B no detalhamento                                             | esperado: 0 | obtido: 0
+OK    | Alertas novos: protocolo sem evidência e reagendamentos sucessivos                              | esperado: protocolo_sem_evidencia,reagendamentos_sucessivos | obtido: protocolo_sem_evidencia,reagendamentos_sucessivos
+OK    | Reagendamentos sucessivos só na tarefa alterada 2 vezes                                         | esperado: TESTE REAGENDADA A | obtido: TESTE REAGENDADA A
+OK    | Prazos em risco: criticidade e data de referência preenchidas                                   | esperado: 0 | obtido: 0
+OK    | Prazos em risco: tudo pendente de conferência até alguém conferir                               | esperado: t | obtido: t
+OK    | Reagendamentos: naturezas separadas (solicitação x efetivação)                                  | esperado: efetivacao:3,solicitacao:1 | obtido: efetivacao:3,solicitacao:1
+OK    | Efetivações sem anotação de justificativa marcadas                                              | esperado: 3 | obtido: 3
+OK    | Texto original e autor da solicitação preservados                                               | esperado: TB|true | obtido: TB|true
+OK    | Antes de configurar o início do monitoramento: concluídas não viram 'sem início'                | esperado: 0 | obtido: 0
+OK    | Depois de configurado: concluídas após a data sem início viram inconsistência                   | esperado: 2|1 | obtido: 2|1
+OK    | Tempo médio abertura→início calculado só com dados reais (1 tarefa, ~30 h, horário de Brasília) | esperado: 1|True | obtido: 1|True
+OK    | Início registrado reduz 'sem início'                                                            | esperado: 6 | obtido: 6
+OK    | Indicador de 24 h só conta tarefas com abertura conhecida (extensão)                            | esperado: 0 | obtido: 0
+OK    | Resumo informa cobertura da extensão (abertura conhecida / início registrado)                   | esperado: 1|1 | obtido: 1|1
+OK    | Anônimo não executa indicadores                                                                 | esperado: negado | obtido: negado
+OK    | Prazos em risco: total exato mesmo com limite de linhas                                         | esperado: 20|2 | obtido: 20|2
+OK    | Prazos em risco: busca por processo ignora pontuação                                            | esperado: 20 | obtido: 20
+OK    | Reagendamentos: filtro por natureza e contagem por natureza                                     | esperado: 1|3 | obtido: 1|3
+OK    | Detalhamento de indicador: total exato + limite                                                 | esperado: 7|3 | obtido: 7|3
+OK    | Tratativa vista pelo colaborador B: só as dele                                                  | esperado: 2 | obtido: 2
+
+41/41 OK — executado em 06/11/2026 10:27

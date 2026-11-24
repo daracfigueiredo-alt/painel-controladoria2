@@ -1,0 +1,33 @@
+# segredos
+.env
+.env.*
+!.env.example
+supabase/.env
+supabase/.temp/
+*.pem
+
+# dados reais e backups (sigilo / LGPD)
+_backup/
+restauracao/
+historico_git.bundle
+*.bundle
+backup_dados_*.json
+Base de processos*.xlsx
+/*.xlsx
+/*.xls
+/*.csv
+conferencia.txt
+tests/out/real.json
+tests/out/concluidas.json
+tests/out/concluidas2.json
+tests/out/resumo_import_real.json
+tests/out/webjur_real_*
+tests/e2e/out/backup/
+
+# dependências, caches, Vercel
+node_modules/
+__pycache__/
+.pytest_cache/
+.vercel/
+Thumbs.db
+.DS_Store

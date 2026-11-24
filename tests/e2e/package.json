@@ -1,0 +1,1 @@
+{ "name": "controladoria-e2e", "private": true, "description": "Testes ponta a ponta do painel (ambiente local)", "dependencies": { "pg": "8.13.1" } }

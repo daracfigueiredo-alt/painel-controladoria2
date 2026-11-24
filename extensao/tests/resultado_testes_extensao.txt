@@ -1,0 +1,55 @@
+OK    | Título (tipo da tarefa, como na tela real)                                        | esperado: Análise do Caso | obtido: Análise do Caso
+OK    | Descrição sem a pontuação "50pts"                                                 | esperado: TF - 19/10 - Prazo 15 dias. PF: 27/10.|Texto fictício. | obtido: TF - 19/10 - Prazo 15 dias. PF: 27/10.|Texto fictício.
+OK    | Data do evento                                                                    | esperado: 19/10/2026 | obtido: 19/10/2026
+OK    | Prazo fatal (PF da Tarefa)                                                        | esperado: 27/10/2026 | obtido: 27/10/2026
+OK    | Criado por / em (abertura)                                                        | esperado: Pessoa Fictícia|16/10/2026 09:15 | obtido: Pessoa Fictícia|16/10/2026 09:15
+OK    | Processo: só o CNJ (sem o ícone "content_copy")                                   | esperado: 0000001-00.2026.8.13.0001 | obtido: 0000001-00.2026.8.13.0001
+OK    | Partes                                                                            | esperado: T001 - Cliente Fictício Ltda|T001 - Banco Fictício S.A. | obtido: T001 - Cliente Fictício Ltda|T001 - Banco Fictício S.A.
+OK    | PF Judicial anotado (texto/data)                                                  | esperado: 27/10|2026-10-27 | obtido: 27/10|2026-10-27
+OK    | Rótulo "Prazo fatal" da tela NÃO vira PF Judicial                                 | esperado: null | obtido: null
+OK    | Responsáveis a partir do title "Nome: Situação"                                   | esperado: Pessoa Um|Pendente|296462 | obtido: Pessoa Um|Pendente|296462
+OK    | ID: botão e URL iguais                                                            | esperado: 900000001|false | obtido: 900000001|false
+OK    | ID: divergência entre botão e URL = não monitorar                                 | esperado: null|true | obtido: null|true
+OK    | ID: sem parâmetro na URL usa o botão                                              | esperado: 900000001 | obtido: 900000001
+OK    | Título a partir da linha da lista                                                 | esperado: MANIFESTAÇÃO SIMPLES|INTIMAÇÃO JUDICIAL | obtido: MANIFESTAÇÃO SIMPLES|INTIMAÇÃO JUDICIAL
+OK    | Conclusão sem início (bloquear)                                                   | esperado: bloquear/bloqueio_efetivo | obtido: bloquear/bloqueio_efetivo
+OK    | Conclusão com início                                                              | esperado: permitir/permitida_apos_validacao | obtido: permitir/permitida_apos_validacao
+OK    | Conclusão sem início (observar)                                                   | esperado: permitir/violacao_detectada | obtido: permitir/violacao_detectada
+OK    | Conclusão sem conexão                                                             | esperado: permitir/nao_monitorada | obtido: permitir/nao_monitorada
+OK    | Edição sem mudar data/PF/responsável: nenhuma trava                               | esperado: 0 | obtido: 0
+OK    | Edição: PF alterado em tarefa com PF Judicial (mesmo admin)                       | esperado: tentativa_alteracao_pf/bloqueio_efetivo | obtido: tentativa_alteracao_pf/bloqueio_efetivo
+OK    | Edição: PF não judicial, admin com justificativa                                  | esperado: permitida_apos_validacao | obtido: permitida_apos_validacao
+OK    | Edição: PF não judicial, colaborador                                              | esperado: bloqueio_efetivo | obtido: bloqueio_efetivo
+OK    | Edição: data alterada sem justificativa = realocação bloqueada                    | esperado: tentativa_realocacao/bloqueio_efetivo/data | obtido: tentativa_realocacao/bloqueio_efetivo/data
+OK    | Edição: responsável trocado com justificativa = realocação permitida              | esperado: permitida_apos_validacao/responsavel | obtido: permitida_apos_validacao/responsavel
+OK    | Encaminhar sem justificativa: registra violação mas NUNCA bloqueia                | esperado: permitir/violacao_detectada | obtido: permitir/violacao_detectada
+OK    | Painel exibido na janela da tarefa                                                | esperado: Tratativa ainda não iniciada.Iniciar tratativa | obtido: Tratativa ainda não iniciada.Iniciar tratativa
+OK    | Janela: Concluir sem início NÃO chega ao ADVBOX                                   | esperado: 0 | obtido: 0
+OK    | Janela: tentativa registrada como bloqueio                                        | esperado: tentativa_conclusao:bloqueio_efetivo | obtido: tentativa_conclusao:bloqueio_efetivo
+OK    | Leitura enviada ao banco: título, datas, CNJ e responsável                        | esperado: Análise do Caso|19/10/2026|27/10/2026|0000001-00.2026.8.13.0001|Pessoa Fictícia Um | obtido: Análise do Caso|19/10/2026|27/10/2026|0000001-00.2026.8.13.0001|Pessoa Fictícia Um
+OK    | Janela: após "Iniciar tratativa", Concluir passa                                  | esperado: 1 | obtido: 1
+OK    | Lista: Concluir sem início bloqueado (não chega ao ADVBOX)                        | esperado: |tentativa_conclusao:bloqueio_efetivo | obtido: |tentativa_conclusao:bloqueio_efetivo
+OK    | Lista: título lido da linha                                                       | esperado: MANIFESTAÇÃO SIMPLES | obtido: MANIFESTAÇÃO SIMPLES
+OK    | Lista: tarefa com início registrado conclui normalmente                           | esperado: 900000003|tentativa_conclusao:permitida_apos_validacao | obtido: 900000003|tentativa_conclusao:permitida_apos_validacao
+OK    | Lista: consulta em lote feita (um pedido para as linhas visíveis)                 | esperado: true | obtido: true
+OK    | Lista: intimação (grupo "publication") fora da trava: conclui sem registro        | esperado: 900000003,900000009| | obtido: 900000003,900000009|
+OK    | Lista: outros ícones (Importante) não são afetados                                | esperado: 0 | obtido: 0
+OK    | "Atribuir tarefa" (cria tarefa nova) não é tratado como realocação                | esperado: 30/10/2026| | obtido: 30/10/2026|
+OK    | Editar tarefa: campo "Justificativa (controladoria)" inserido                     | esperado: true | obtido: true
+OK    | Editar: PF alterado em tarefa com PF Judicial bloqueado                           | esperado: null|tentativa_alteracao_pf:bloqueio_efetivo | obtido: null|tentativa_alteracao_pf:bloqueio_efetivo
+OK    | Editar: data alterada sem justificativa bloqueada                                 | esperado: null|tentativa_realocacao:bloqueio_efetivo | obtido: null|tentativa_realocacao:bloqueio_efetivo
+OK    | Editar: com justificativa passa e a justificativa NÃO é enviada ao ADVBOX         | esperado: 21/10/2026|false | obtido: 21/10/2026|false
+OK    | Editar: justificativa registrada no evento da controladoria                       | esperado: true | obtido: true
+OK    | Token da página nunca é enviado                                                   | esperado: false | obtido: false
+OK    | Editar: troca de responsável detectada como realocação (com justificativa: passa) | esperado: 296463|tentativa_realocacao:permitida_apos_validacao | obtido: 296463|tentativa_realocacao:permitida_apos_validacao
+OK    | Editar em modo observar: passa e registra violação                                | esperado: 30/10/2026|tentativa_alteracao_pf:violacao_detectada | obtido: 30/10/2026|tentativa_alteracao_pf:violacao_detectada
+OK    | Campo de justificativa inserido UMA vez por formulário, dentro dele               | esperado: 1|1|0 | obtido: 1|1|0
+OK    | Encaminhar sem justificativa: passa e registra violação                           | esperado: 900000001|tentativa_realocacao:violacao_detectada | obtido: 900000001|tentativa_realocacao:violacao_detectada
+OK    | Sem login → não monitorada (não bloqueia)                                         | esperado: 1|tentativa_conclusao:nao_monitorada | obtido: 1|tentativa_conclusao:nao_monitorada
+OK    | Painel avisa que não há monitoramento                                             | esperado: true | obtido: true
+OK    | Sem login, lista: não bloqueia e registra não monitorada                          | esperado: 900000002 | obtido: 900000002
+OK    | Clique antes da verificação é segurado (sem registro)                             | esperado: 0| | obtido: 0|
+OK    | ID divergente (botão x URL): não monitora e avisa                                 | esperado: true | obtido: true
+OK    | Reabrir a janela consulta o status de novo                                        | esperado: 2 | obtido: 2
+
+53/53 OK

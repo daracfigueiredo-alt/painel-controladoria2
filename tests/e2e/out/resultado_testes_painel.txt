@@ -1,0 +1,42 @@
+OK    | Login com senha errada é recusado com mensagem                                                   | esperado: true | obtido: true
+OK    | Colaborador entra e o menu mostra as 11 áreas                                                    | esperado: 11 | obtido: 11
+OK    | Colaborador não acessa a importação na tela                                                      | esperado: true | obtido: true
+OK    | Colaborador chamando a função direto (fora da tela) é barrado pelo banco                         | esperado: 403|Somente administradores podem importar | obtido: 403|Somente administradores podem importar
+OK    | Nenhuma importação gravada pelo colaborador                                                      | esperado: 0 | obtido: 0
+OK    | Sessão guardada só na aba (sessionStorage), não em localStorage                                  | esperado: 0 | obtido: 0
+OK    | Admin entra na Visão geral                                                                       | esperado: Visão geral | obtido: Visão geral
+OK    | Área Importação Excel abre pelo menu                                                             | esperado: Importação Excel | obtido: Importação Excel
+OK    | Base vazia informada                                                                             | esperado: true | obtido: true
+OK    | Opção "complementar" desabilitada sem base                                                       | esperado: true | obtido: true
+OK    | Arquivo que não é .xlsx bloqueado antes do envio                                                 | esperado: true | obtido: true
+OK    | Coluna obrigatória ausente bloqueada antes do envio                                              | esperado: true | obtido: true
+OK    | Botão de importar desabilitado sem arquivo válido                                                | esperado: true | obtido: true
+OK    | Leitor do painel = conversor Python (openpyxl): Advbox-2026-10-24_0717524.xlsx — linhas e hash   | esperado: 878|61862f3cd99eb9335610786ffac4a164c17e75d4c92c83d3218870766862b47e|iguais | obtido: 878|61862f3cd99eb9335610786ffac4a164c17e75d4c92c83d3218870766862b47e|iguais
+OK    | Leitor do painel = conversor Python (openpyxl): Advbox-2026-10-24_0443625.xlsx — linhas e hash   | esperado: 50|320008bb8ee3015ee89f3f45f5d89642e7983f7a37c6b0c9c503e89e6a700cee|iguais | obtido: 50|320008bb8ee3015ee89f3f45f5d89642e7983f7a37c6b0c9c503e89e6a700cee|iguais
+OK    | Leitor do painel = conversor Python (openpyxl): Advbox-2026-10-24_0687502.xlsx — linhas e hash   | esperado: 50|e5f2e6f197cd69577720457c01dbd914b6e24dfafc9d3cd51c2311066cf9a484|iguais | obtido: 50|e5f2e6f197cd69577720457c01dbd914b6e24dfafc9d3cd51c2311066cf9a484|iguais
+OK    | Linha vazia no meio mantida (numeração), vazias no fim descartadas                               | esperado: TESTE FICTÍCIO A||TESTE FICTÍCIO B | obtido: TESTE FICTÍCIO A||TESTE FICTÍCIO B
+OK    | Pré-conferência: 878 linhas, 31 concluídas, cria lote novo                                       | esperado: true | obtido: true
+OK    | Importação real concluída e gravada                                                              | esperado: concluida|878 | obtido: concluida|878
+OK    | Números da tela = números gravados no banco (novas/atualizadas/ignoradas/rejeitadas/sem vínculo) | esperado: 863|0|0|0|15 | obtido: 863|0|0|0|15
+OK    | Processos registrados = CNJs distintos válidos do arquivo                                        | esperado: 381 | obtido: 381
+OK    | Tempo da importação de 878 linhas pela tela (2.5 s) abaixo de 60 s                               | esperado: true | obtido: true
+OK    | Base atual atualizada após importar                                                              | esperado: true | obtido: true
+OK    | Prévia alerta: só concluídas como nova fotografia                                                | esperado: true | obtido: true
+OK    | Banco pede confirmação e nada é gravado antes dela                                               | esperado: 1 | obtido: 1
+OK    | Concluídas entraram no MESMO lote das pendentes                                                  | esperado: 1|2 | obtido: 1|2
+OK    | Visão atual = 878 + 50 linhas (fotografia do dia preservada)                                     | esperado: 928 | obtido: 928
+OK    | 2º arquivo de concluídas complementando: 5 linhas repetidas ignoradas                            | esperado: 5 | obtido: 5
+OK    | Após os 3 arquivos reais: 418 processos (mesmo número da bateria do banco)                       | esperado: 418 | obtido: 418
+OK    | Mesmo arquivo de novo: avisado e nada alterado                                                   | esperado: true|3 | obtido: true|3
+OK    | Arquivo com erros: 2 rejeitadas de 4                                                             | esperado: 2 | obtido: 2
+OK    | Data da exportação do lote = data no nome do 1º arquivo do lote                                  | esperado: 2026-10-24 | obtido: 2026-10-24
+OK    | Detalhe mostra o erro com o número da linha da planilha                                          | esperado: true | obtido: true
+OK    | Detalhe mostra avisos (CNJ fora do padrão, agenda após PF)                                       | esperado: true | obtido: true
+OK    | Linhas rejeitadas identificadas pelo número da planilha (3 e 4)                                  | esperado: 3,4 | obtido: 3,4
+OK    | Linha vazia do meio rejeitada como linha 3 (numeração preservada)                                | esperado: 3|Data da agenda ausente | obtido: 3|Data da agenda ausente
+OK    | Histórico lista todas as importações gravadas                                                    | esperado: 5 | obtido: 5
+OK    | Não há botão de excluir importação nem exportar CSV                                              | esperado: 0 | obtido: 0
+OK    | Celular (390 px): sem rolagem horizontal da página                                               | esperado: true | obtido: true
+OK    | Sem erros no console do navegador (inclui violações de CSP)                                      | esperado:  | obtido: 
+
+40/40 OK — executado em 06/11/2026, 10:27:44

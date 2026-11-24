@@ -1,0 +1,66 @@
+OK    | D-4 exemplo escritório: PF 27/10/2026                                        | esperado: 2026-10-22 | obtido: 2026-10-22
+OK    | D-4 exemplo escritório: PF 26/10/2026                                        | esperado: 2026-10-21 | obtido: 2026-10-21
+OK    | Leitura literal '4 dias úteis antes' de 27/10 (documentação da divergência)  | esperado: 2026-10-21 | obtido: 2026-10-21
+OK    | D-4 pula feriado nacional (PF 03/11/2026; 02/11 Finados)                     | esperado: 2026-10-28 | obtido: 2026-10-28
+OK    | D-4 pula fim de semana + 20/11 (PF 23/11/2026)                               | esperado: 2026-11-17 | obtido: 2026-11-17
+OK    | D-4 com feriado fictício do tribunal 8.05 em 28/10                           | esperado: 2026-10-27 | obtido: 2026-10-27
+OK    | Mesmo feriado não afeta outro tribunal (8.04, sem calendário cadastrado)     | esperado: 2026-10-28 | obtido: 2026-10-28
+OK    | Dias úteis entre 24/10 (sáb) e 27/10 (ter)                                   | esperado: 2 | obtido: 2
+OK    | Tribunal extraído do CNJ 5001032-73.2024.8.13.0325                           | esperado: 8.13 | obtido: 8.13
+OK    | Ano inferido de 'PF: 05/01' com referência 20/12/2026                        | esperado: 2027-01-05 | obtido: 2027-01-05
+OK    | Colaborador NÃO pode importar                                                | esperado: erro 42501/Somente administradores | obtido: erro 42501/Somente administradores
+OK    | Importação fictícia: total/válidas/rejeitadas                                | esperado: 5/4/1 | obtido: 5/4/1
+OK    | Motivo da rejeição informado por linha                                       | esperado: 4:Data inválida: 31/02/2026 | obtido: 4:Data inválida: 31/02/2026
+OK    | Mesmo arquivo (mesmo hash) novamente: nada é gravado                         | esperado: ja_importado | obtido: ja_importado
+OK    | Linhas gravadas após reimportação                                            | esperado: 5 | obtido: 5
+OK    | Arquivo com linhas repetidas no mesmo lote: duplicadas ignoradas             | esperado: 2 | obtido: 2
+OK    | PF Judicial anotado extraído (linha 2)                                       | esperado: 2026-10-27|2026-10-22|2026-10-27 | obtido: 2026-10-27|2026-10-22|2026-10-27
+OK    | Encaminhamento recuperado como histórico (1 evento)                          | esperado: 1|true | obtido: 1|true
+OK    | Pedido de reagendamento classificado como POTENCIAL                          | esperado: 1|potencial|30/10 | obtido: 1|potencial|30/10
+OK    | Pedido de reagendamento NÃO gera reagendamento efetivado                     | esperado: 0 | obtido: 0
+OK    | Conclusão registrada uma vez                                                 | esperado: 1 | obtido: 1
+OK    | Arquivo com 1.001 linhas é recusado                                          | esperado: recusado | obtido: recusado
+OK    | Arquivo sem coluna obrigatória é rejeitado                                   | esperado: rejeitada:Prazo fatal | obtido: rejeitada:Prazo fatal
+OK    | Lote 2: tarefas reconhecidas (sem duplicar)                                  | esperado: 2/0 | obtido: 2/0
+OK    | Alterações de data/PF observadas entre importações                           | esperado: 1/2 | obtido: 1/2
+OK    | Alterações sem justificativa / PF antecipado                                 | esperado: 1/1 | obtido: 1/1
+OK    | Mudança de PF em tarefa com PF Judicial = violação detectada (2 casos)       | esperado: 2 | obtido: 2
+OK    | Mudança de data com anotação: detectada, não bloqueada                       | esperado: nao_monitorada | obtido: nao_monitorada
+OK    | Violação de PF aparece na tela de prazos em risco                            | esperado: 2 | obtido: 2
+OK    | Encaminhamento não duplicado no lote 2                                       | esperado: 1 | obtido: 1
+OK    | PF Judicial NÃO muda com o PF da Tarefa                                      | esperado: 2026-11-03 | obtido: 2026-11-03
+OK    | Extensão: tarefa da tela vinculada à linha do Excel (único candidato)        | esperado: excel_unico|None|2026-10-27 | obtido: excel_unico|None|2026-10-27
+OK    | Extensão: data de criação lida na tela vira 'abertura' (horário de Brasília) | esperado: 2026-10-16 12:15:00 | obtido: 2026-10-16 12:15:00
+OK    | Extensão: início registrado / 2º início recusado / reenvio idempotente       | esperado: registrado|ja_iniciada|ja_registrado | obtido: registrado|ja_iniciada|ja_registrado
+OK    | Extensão: só um início por tarefa, com horário do servidor                   | esperado: 1|segundo | obtido: 1|segundo
+OK    | Extensão: colaborador não pode registrar exceção autorizada                  | esperado: negado | obtido: negado
+OK    | Extensão: tipo de evento fora da lista é recusado                            | esperado: recusado | obtido: recusado
+OK    | Extensão: tentativa de conclusão registrada e visível em v_travas            | esperado: bloqueio_efetivo | obtido: bloqueio_efetivo
+OK    | Extensão: tarefa sem correspondência no Excel fica identificada como tal     | esperado: sem_correspondencia | obtido: sem_correspondencia
+OK    | Extensão: anônimo não chama as funções                                       | esperado: negado | obtido: negado
+OK    | Extensão: ID de tarefa malformado recusado                                   | esperado: recusado | obtido: recusado
+OK    | Status após início mostra quem iniciou                                       | esperado: TESTE FICTICIO COLABORADOR | obtido: TESTE FICTICIO COLABORADOR
+OK    | Alerta: aberta há mais de 24 h sem início (abertura lida na tela)            | esperado: 1 | obtido: 1
+OK    | Evento de auditoria não pode ser alterado                                    | esperado: bloqueado | obtido: bloqueado
+OK    | Importação não pode ser excluída                                             | esperado: bloqueado | obtido: bloqueado
+OK    | Anônimo não lê linhas                                                        | esperado: negado | obtido: negado
+OK    | Colaborador não grava direto na auditoria                                    | esperado: negado | obtido: negado
+OK    | Função interna não é exposta                                                 | esperado: negado | obtido: negado
+OK    | Colaborador vê só as próprias tarefas                                        | esperado: 2 | obtido: 2
+OK    | Outro colaborador não vê tarefas alheias                                     | esperado: 0 | obtido: 0
+OK    | Colaborador não vê importações                                               | esperado: 0 | obtido: 0
+OK    | Real: total de linhas                                                        | esperado: 878 | obtido: 878
+OK    | Real: válidas+rejeitadas+duplicadas = total                                  | esperado: 878 | obtido: 878
+OK    | Real: reimportação do mesmo arquivo                                          | esperado: ja_importado | obtido: ja_importado
+OK    | Real: PF anotado ≠ PF da Tarefa (diagnóstico prévio: 16)                     | esperado: 16 | obtido: 16
+OK    | Real: conclusões (Data Conclusão preenchida: 31)                             | esperado: 31 | obtido: 31
+OK    | Real: soma por categoria = total de alertas (sem perda na consolidação)      | esperado: 2344 | obtido: 2344
+OK    | Concluídas: 50 linhas válidas, nenhuma rejeitada                             | esperado: 50/0 | obtido: 50/0
+OK    | Concluídas: recorrentes distinguidas (0 ambíguas)                            | esperado: 0 | obtido: 0
+OK    | Lote com 2 arquivos: conclusões sem duplicar (31 + 50)                       | esperado: 81 | obtido: 81
+OK    | Lote com 2 arquivos: fotografia do dia = 878 + 50 linhas                     | esperado: 928 | obtido: 928
+OK    | Concluídas: reimportação do mesmo arquivo                                    | esperado: ja_importado | obtido: ja_importado
+OK    | 3º arquivo (concluídas, período sobreposto): 5 linhas repetidas ignoradas    | esperado: 45/5 | obtido: 45/5
+OK    | 3 arquivos no lote: conclusões distintas (31 + 50 + 45)                      | esperado: 126 | obtido: 126
+
+64/64 OK — executado em 06/11/2026 10:27

@@ -1,0 +1,65 @@
+{
+  "manifest_version": 3,
+  "name": "Controladoria Oliveira e Camilo — Atlas e ADVBOX (teste)",
+  "version": "0.7.0",
+  "description": "Registra o início da tratativa e aplica as regras da controladoria nas tarefas do Atlas Gestor e do ADVBOX; lê as intimações do ADVBOX para o double check. Versão de teste.",
+  "permissions": [
+    "storage",
+    "alarms"
+  ],
+  "host_permissions": [
+    "https://app.advbox.com.br/*",
+    "https://gestor.atlasjus.com/*",
+    "https://*.supabase.co/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Controladoria"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://app.advbox.com.br/*"
+      ],
+      "js": [
+        "lib/advbox_parse.js",
+        "lib/advbox_intimacoes.js",
+        "lib/advbox_criacao.js",
+        "content.js",
+        "intimacoes.js",
+        "criacao.js"
+      ],
+      "css": [
+        "content.css"
+      ],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://gestor.atlasjus.com/*"
+      ],
+      "js": [
+        "lib/atlas_regras.js",
+        "atlas_ponte.js"
+      ],
+      "run_at": "document_start",
+      "world": "MAIN"
+    },
+    {
+      "matches": [
+        "https://gestor.atlasjus.com/*"
+      ],
+      "js": [
+        "lib/atlas_regras.js",
+        "atlas_content.js"
+      ],
+      "css": [
+        "content.css"
+      ],
+      "run_at": "document_idle"
+    }
+  ]
+}

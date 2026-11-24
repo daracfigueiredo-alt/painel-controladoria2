@@ -1,0 +1,43 @@
+.oc-painel{margin:8px 16px;padding:8px 12px;border-radius:6px;font:13px/1.4 system-ui,sans-serif;
+  border:1px solid #3b82f6;background:rgba(59,130,246,.10);color:inherit;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.oc-painel.oc-ok{border-color:#16a34a;background:rgba(22,163,74,.10)}
+.oc-painel.oc-alerta{border-color:#d97706;background:rgba(217,119,6,.12)}
+.oc-painel button{padding:4px 10px;border-radius:4px;border:0;background:#2563eb;color:#fff;cursor:pointer;font:inherit}
+.oc-painel button[disabled]{opacity:.6;cursor:default}
+.oc-aviso{position:fixed;z-index:2147483647;left:50%;top:16px;transform:translateX(-50%);max-width:560px;
+  padding:12px 16px;border-radius:8px;background:#7f1d1d;color:#fff;font:14px/1.45 system-ui,sans-serif;box-shadow:0 6px 24px rgba(0,0,0,.35)}
+.oc-aviso b{display:block;margin-bottom:4px}
+.oc-sutil { opacity: .8; font-size: 12px; }
+.oc-justificativa { display: flex; flex-direction: column; gap: 4px; margin: 10px 0; padding: 8px 10px; border: 1px solid #1f3a5f; border-radius: 6px; background: #f2f6fb; font-size: 12px; color: #1f3a5f; }
+.oc-justificativa textarea { width: 100%; box-sizing: border-box; font: inherit; font-size: 13px; padding: 4px 6px; border: 1px solid #b9c6d6; border-radius: 4px; background: #fff; color: #111; }
+.oc-varredura { display: flex; flex-wrap: wrap; gap: .5rem 1rem; align-items: center; margin: .5rem 0; }
+.oc-varredura button { font: inherit; padding: .35rem .8rem; border-radius: 6px; border: 1px solid #2a78d6; background: #2a78d6; color: #fff; cursor: pointer; }
+.oc-varredura button:disabled { opacity: .6; cursor: progress; }
+.oc-varredura-saida { font-size: .85rem; }
+.oc-criacao-banner { position: fixed; z-index: 2147483647; right: 16px; bottom: 16px; max-width: 420px; padding: 10px 14px; border-radius: 8px;
+  background: #1f3a5f; color: #fff; font: 13px/1.45 system-ui, sans-serif; box-shadow: 0 6px 24px rgba(0,0,0,.3); }
+.oc-criacao-banner.oc-criacao-ok { background: #166534; }
+.oc-criacao-banner.oc-criacao-alerta { background: #92400e; }
+/* Atlas Gestor (0.5.0): diálogo de justificativa/bloqueio e etiqueta de líder */
+.oc-dialogo{max-width:520px;border:1px solid #cbd5e1;border-radius:10px;padding:18px 20px;font:14px/1.45 system-ui,sans-serif;color:#0f172a;background:#fff}
+.oc-dialogo::backdrop{background:rgba(15,23,42,.45)}
+.oc-dialogo h2{margin:0 0 8px;font-size:16px}
+.oc-dialogo ul{margin:0 0 12px;padding-left:18px}
+.oc-dialogo label{display:block;font-weight:600}
+.oc-dialogo textarea{display:block;width:100%;box-sizing:border-box;margin-top:6px;font:inherit;padding:6px 8px;border:1px solid #94a3b8;border-radius:6px}
+.oc-dialogo .oc-erro{color:#b91c1c;min-height:1em;margin:6px 0 0}
+.oc-acoes{display:flex;gap:8px;justify-content:flex-end;margin-top:12px}
+.oc-btn{padding:6px 12px;border-radius:6px;border:0;background:#2563eb;color:#fff;cursor:pointer;font:inherit}
+.oc-btn-sec{background:#e2e8f0;color:#0f172a}
+.oc-btn[disabled]{opacity:.6;cursor:default}
+.oc-tag{display:inline-block;padding:1px 6px;border-radius:999px;background:#ecfccb;color:#3f6212;font-size:12px}
+.oc-painel .oc-d4{flex-basis:100%;display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding-top:6px;border-top:1px solid rgba(59,130,246,.35)}
+.oc-painel .oc-d4 .oc-tag{background:#16a34a;color:#fff}
+.oc-painel .oc-exec{flex-basis:100%;padding-top:6px;border-top:1px solid rgba(59,130,246,.35)}
+.oc-painel .oc-exec summary{cursor:pointer;font-weight:600}
+.oc-painel .oc-exec-pendente summary{color:#b45309}
+.oc-painel .oc-exec p{margin:6px 0}
+.oc-painel .oc-exec a{color:#2563eb;text-decoration:underline}
+.oc-checklist{list-style:none;margin:6px 0;padding:0;display:grid;gap:4px}
+.oc-checklist label{display:flex;gap:6px;align-items:flex-start}
+.oc-acoes-linha{display:flex;gap:8px;align-items:center;flex-wrap:wrap}

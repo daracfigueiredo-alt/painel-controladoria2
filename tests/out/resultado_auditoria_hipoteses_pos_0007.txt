@@ -1,0 +1,18 @@
+OK     | H1 Recorrente realocada: antes de reabrir a tarefa                | requisito: o início não se perde em silêncio: a tarefa aparece em v_tarefas_sem_linha_atual (vínculo a refazer)
+       |                                                                   | observado: lote2 tarefas_novas=1; início na visão atual=NULO; listada como sem linha atual=1
+OK     | H1b Recorrente realocada: depois de reabrir a tarefa na extensão  | requisito: extensão e painel mostram o mesmo início; unificação auditada
+       |                                                                   | observado: extensão início=True; painel início=sim; eventos de unificação=1
+OK     | H2 Tarefa vista pela extensão antes de aparecer no Excel          | requisito: uma única tarefa (registros unificados); início visível no painel
+       |                                                                   | observado: vínculo inicial=sem_correspondencia; tarefas distintas=1; unificadas na importação=1; início na visão atual=2026-11-06 10:27:21.8981-03
+OK     | H3 Início registrado pelo admin, visto pelo responsável           | requisito: o responsável enxerga o mesmo início que o admin
+       |                                                                   | observado: admin vê=sim; responsável vê=sim
+OK     | H4 Colaborador consulta tarefa de outro responsável pela extensão | requisito: permitido por decisão do escritório de 05/11/2026; o autor do início fica registrado
+       |                                                                   | observado: colaborador B recebeu status (início=True, PF judicial=None)
+OK     | H5 Conclusão 'permitida' em tarefa SEM início                     | requisito: servidor recusa ou reclassifica (preservando o que foi declarado)
+       |                                                                   | observado: aceito=True; gravado como=violacao_detectada|permitida_apos_validacao
+OK     | H6 Privilégio de execução para anon                               | requisito: anon não executa nenhuma função
+       |                                                                   | observado: _dt_tela=false, _ts_tela=false, ext_status_tarefa=false, importar_arquivo=false, is_admin=false
+OK     | H7 Arquivo de concluídas importado como lote novo por engano      | requisito: a fotografia atual não deve ser substituída por um arquivo parcial sem aviso
+       |                                                                   | observado: tarefas na visão atual: antes=4, depois=4
+
+8 conformes, 0 achados, 0 a decidir, de 8 verificações

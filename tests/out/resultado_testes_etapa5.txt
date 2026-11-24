@@ -1,0 +1,15 @@
+OK    | Título real 'Análise do Caso' casa com 'ANÁLISE DO CASO' do Excel (upper com acento) | esperado: excel_unico | obtido: excel_unico
+OK    | Lote: tarefa com início devolve a data; desconhecida devolve nulo                    | esperado: True|None | obtido: True|None
+OK    | Lote: devolve os modos das travas                                                    | esperado: bloquear | obtido: bloquear
+OK    | Lote: só leitura (não cria registro de tarefa)                                       | esperado: 2 | obtido: 2
+OK    | Lote: ID inválido recusado                                                           | esperado: recusado | obtido: recusado
+OK    | Lote: mais de 200 IDs recusado                                                       | esperado: recusado | obtido: recusado
+OK    | Lote: anônimo não executa                                                            | esperado: negado | obtido: negado
+OK    | Lote: usuário sem perfil recusado                                                    | esperado: recusado | obtido: recusado
+OK    | Leitura completa da janela preservada após clique na lista                           | esperado: 27/10/2026 | obtido: 27/10/2026
+OK    | Conclusão pela lista com início registrado: permitida                                | esperado: permitida_apos_validacao | obtido: permitida_apos_validacao
+OK    | Conclusão pela lista sem início declarada 'permitida' é reclassificada               | esperado: violacao_detectada | obtido: violacao_detectada
+OK    | Realocação pelo 'Editar tarefa' com justificativa: aceita e guardada                 | esperado: permitida_apos_validacao|true | obtido: permitida_apos_validacao|true
+OK    | Realocação declarada 'permitida' com justificativa curta é reclassificada            | esperado: violacao_detectada | obtido: violacao_detectada
+
+13/13 OK — executado em 06/11/2026 10:27
