@@ -34,8 +34,9 @@ no formato `nome@oecadv.gmail.com`, que o Gmail não aceita).
 O sistema não cria contas sozinho: criar conta no Supabase exige a chave secreta, que fica só com a controladoria.
 
 1. **Aplicar a migração** `supabase/migrations/0061_acessos_lideres_diretoria.sql` no SQL Editor do Supabase.
-2. **Criar as 9 contas:** Supabase › Authentication › Users › **Add user › Send invitation**, um e-mail por vez.
-   Cada pessoa recebe o convite e define a própria senha (ninguém digita senha por ela).
+2. **Criar as 9 contas:** Supabase › Authentication › Users › **Add user › Create new user**, com a senha e
+   **Auto Confirm User** marcado. A senha é definida pela controladoria (decisão de 26/11/2026; veja a
+   `docs/ETAPA20_SENHA_PELA_CONTROLADORIA.md`). Não usar "Send invitation".
 3. **Conferir** no SQL Editor do Supabase:
    ```sql
    select email, nome, papel, equipe, aplicado_em, observacao from public.acessos_previstos order by papel desc, equipe;

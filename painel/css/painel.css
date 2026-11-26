@@ -345,3 +345,7 @@ a { color: var(--ouro-texto); }
   .topo .sessao { display: none; }
   .marca-nome { color: #8a6116; }
 }
+
+/* Configurações › Usuários: definir senha (0062) */
+.cf-senha > summary { white-space: nowrap; cursor: pointer; }
+.cf-senha[open] { display: flex; flex-direction: column; gap: .35rem; min-width: 12rem; }

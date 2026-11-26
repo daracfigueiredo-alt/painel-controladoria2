@@ -163,7 +163,7 @@
     const nomesLideres = Array.isArray(lid && lid.valor) ? lid.valor.join(', ') : '';
     el.textContent = '';
     el.append(h('h2', {}, 'Usuários e perfis'),
-      h('p', { class: 'sutil' }, 'As contas são criadas no Supabase (Authentication → Users), com o cadastro público desligado. Aqui se define o papel: ',
+      h('p', { class: 'sutil' }, 'As contas são criadas no Supabase (Authentication → Users → Add user → Create new user, com "Auto Confirm User"), com o cadastro público desligado. A senha é definida pela controladoria e pode ser trocada aqui em "Definir senha". Aqui se define o papel: ',
         'controladoria (administradora) vê e altera tudo; diretoria vê tudo, sem alterar; peticionador (colaborador) vê só as próprias tarefas e precisa estar ligado ao seu nome; ',
         'líder' + (nomesLideres ? ' (' + nomesLideres + ')' : '') + ' vê as tarefas das equipes que acompanha, solicita tarefas e reagendamentos ',
         'e altera data, responsável e prazo fatal sem bloqueio da extensão, com tudo registrado.'));
@@ -188,8 +188,33 @@
             await usuarios();
             raiz.querySelector('#cf-usuarios-saida').append(aviso('info', `${u.email}: papel atualizado.`));
           } }, 'Salvar'), u.papel === 'lider' ? equipesLider(u, saida) : null);
-        } }
+        } },
+      { titulo: 'Senha', valor: u => definirSenha(u, saida) }
     ], us || []));
+  }
+  // senha definida pela controladoria (0062, Edge Function admin-senha); a senha não é guardada no painel nem no banco
+  function definirSenha(u, saida) {
+    const caixa = h('details', { class: 'cf-senha' }, h('summary', {}, 'Definir senha'));
+    const senha = h('input', { type: 'password', autocomplete: 'new-password', placeholder: 'Nova senha (mín. 8)', 'aria-label': 'Nova senha de ' + u.email });
+    const conf = h('input', { type: 'password', autocomplete: 'new-password', placeholder: 'Repita a senha', 'aria-label': 'Repita a senha de ' + u.email });
+    const motivo = h('input', { type: 'text', placeholder: 'Motivo', 'aria-label': 'Motivo (senha de ' + u.email + ')' });
+    const msg = h('p', { class: 'erro', role: 'alert' });
+    const botao = h('button', { type: 'button', class: 'btn btn-sec btn-peq', onclick: async () => {
+      msg.textContent = ''; saida.textContent = '';
+      if (senha.value.length < 8) { msg.textContent = 'A senha precisa ter pelo menos 8 caracteres.'; return; }
+      if (senha.value !== conf.value) { msg.textContent = 'As duas senhas não são iguais.'; return; }
+      if (motivo.value.trim().length < 10) { msg.textContent = 'Informe o motivo (mínimo 10 caracteres).'; return; }
+      botao.disabled = true;
+      const { data: d, error: e } = await ctx.sb.functions.invoke('admin-senha', { body: { user_id: u.user_id, senha: senha.value, motivo: motivo.value } });
+      botao.disabled = false;
+      let erro = e ? e.message : (d && d.erro) || null;
+      if (e && e.context && typeof e.context.json === 'function') { try { const j = await e.context.json(); if (j && j.erro) erro = j.erro; } catch (_) { /* sem corpo */ } }
+      if (erro) { msg.textContent = erro; return; }
+      senha.value = ''; conf.value = ''; motivo.value = ''; caixa.open = false;
+      saida.append(aviso('info', `${u.email}: senha definida. Passe a senha à pessoa por um canal seguro (de preferência pessoalmente).`));
+    } }, 'Salvar senha');
+    caixa.append(senha, conf, motivo, botao, msg);
+    return caixa;
   }
   // equipes que o líder acompanha (0038)
   function equipesLider(u, saida) {
