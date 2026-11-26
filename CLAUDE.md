@@ -68,7 +68,7 @@ O `README.md` tem a estrutura geral, mas a tabela de etapas dele está desatuali
   - projeto `controladoria-homologacao`, id `impoejdocxuihficjvxm`, São Paulo;
   - URL `https://impoejdocxuihficjvxm.supabase.co`;
   - a chave publicável está em `painel/js/config.js` e `extensao/config.js`.
-- **Migrações:** 0001 a 0062 (a 0042 criou o agendamento das 18:30, ligado em 11/11; a 0045, os da captura do CNJ; a 0054 registrou o módulo de intimações do Atlas ativado em 16/11 — veja `docs/ETAPA14_INTIMACOES_CNJ.md`), a 0062 ainda não aplicada; as demais aplicadas no banco de homologação, em ordem numérica. Não existe projeto de produção ainda.
+- **Migrações:** 0001 a 0062 (a 0042 criou o agendamento das 18:30, ligado em 11/11; a 0045, os da captura do CNJ; a 0054 registrou o módulo de intimações do Atlas ativado em 16/11 — veja `docs/ETAPA14_INTIMACOES_CNJ.md`), todas aplicadas no banco de homologação (a 0062 e a função `admin-senha` em 26/11), em ordem numérica. Não existe projeto de produção ainda.
 - **Edge Functions:** `atlas-sync` (11/11/2026), `webjur-email` e `cnj-captura` (12/11/2026) e `atlas-cadastro` (14/11/2026) e `admin-senha` (26/11/2026), todas com `verify_jwt` ligado.
 - **Usuários:** login por e-mail e senha no Supabase Auth, com cadastro público desligado. Perfis em `perfis`:
   - `admin` = controladoria;

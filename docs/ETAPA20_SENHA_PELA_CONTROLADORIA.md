@@ -41,4 +41,4 @@ Como funciona:
   `node --experimental-strip-types tests/admin/testar_senha.mjs` (ou `deno run`).
 - `tests/e2e/testar_senha.js` — 11 verificações da tela (banco do `test_etapa20.py` com `MANTER=1`; a função é simulada).
 
-Nenhum teste real ainda: falta publicar a função e aplicar a migração no Supabase.
+Migração 0062 aplicada e função `admin-senha` publicada pela controladoria em 26/11/2026. Teste real da troca de senha: ainda não feito.
