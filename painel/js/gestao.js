@@ -63,6 +63,11 @@
   }
   const kpi = (rotulo, valor, desc, atencao) => h('div', { class: 'kpi' + (atencao ? ' kpi-atencao' : '') },
     h('span', { class: 'kpi-rotulo' }, rotulo), h('span', { class: 'kpi-valor' }, valor), desc ? h('span', { class: 'kpi-desc' }, desc) : null);
+  // indicador que leva à lista correspondente (0064: painel da diretoria). destino '#/área'; antes de ir, guarda um filtro/rolagem
+  const kpiAtalho = (rotulo, valor, desc, atencao, destino, preparar) => h('a', { class: 'kpi kpi-link' + (atencao ? ' kpi-atencao' : ''), href: destino,
+      onclick: () => { try { if (preparar) preparar(); } catch (e) { /* sem sessionStorage */ } } },
+    h('span', { class: 'kpi-rotulo' }, rotulo), h('span', { class: 'kpi-valor' }, valor), desc ? h('span', { class: 'kpi-desc' }, desc) : null,
+    h('span', { class: 'kpi-ir', 'aria-hidden': 'true' }, 'Abrir →'));
   const link = (url, texto) => url ? h('a', { href: url, target: '_blank', rel: 'noopener noreferrer' }, texto) : null;
 
   // ---------------------------------------------------------------- arquivos (Storage, bucket privado "pecas")
@@ -105,13 +110,38 @@
     corpo.textContent = '';
     const ult = r.ultimo_relatorio;
     corpo.append(h('section', { class: 'kpis', 'aria-label': 'Resumo' },
-      kpi('Inconsistências abertas', num(r.inconsistencias_abertas), `${num(r.inconsistencias_criticas)} críticas`, r.inconsistencias_criticas > 0),
-      kpi('Solicitações aguardando a controladoria', num(r.solicitacoes_aguardando), `${num(r.solicitacoes_mes)} no mês`, r.solicitacoes_aguardando > 0),
-      kpi('Entregas autorizadas após o D-4', num(r.excecoes_d4_ativas), 'exceções ativas'),
-      kpi('Modalidades padronizadas ativas', num(r.modalidades_ativas), 'com checklist e anexos obrigatórios'),
+      kpiAtalho('Inconsistências abertas', num(r.inconsistencias_abertas), `${num(r.inconsistencias_criticas)} críticas`, r.inconsistencias_criticas > 0,
+        '#/inconsistencias'),
+      kpiAtalho('Solicitações aguardando a controladoria', num(r.solicitacoes_aguardando), `${num(r.solicitacoes_mes)} no mês`, r.solicitacoes_aguardando > 0,
+        '#/solicitacoes', () => sessionStorage.setItem('ctrl-sol-status', 'aguardando_controladoria')),
+      kpiAtalho('Entregas autorizadas após o D-4', num(r.excecoes_d4_ativas), 'exceções ativas', false,
+        '#/prazos', () => sessionStorage.setItem('ctrl-rolar', 'excecoes-d4')),
+      h('button', { type: 'button', class: 'kpi kpi-link', 'aria-expanded': 'false', 'aria-controls': 'dir-modalidades', onclick: ev => abrirModalidades(ev.currentTarget) },
+        h('span', { class: 'kpi-rotulo' }, 'Modalidades padronizadas ativas'), h('span', { class: 'kpi-valor' }, num(r.modalidades_ativas)),
+        h('span', { class: 'kpi-desc' }, 'com checklist e anexos obrigatórios'), h('span', { class: 'kpi-ir', 'aria-hidden': 'true' }, 'Ver a lista ↓')),
       kpi('Último relatório diário', ult ? dataHora(ult.executado_em) : '—', ult ? (ult.origem === 'automatico' ? 'rotina automática' : 'executado no painel') : 'ainda não executado')),
       h('p', {}, h('a', { href: '#/inconsistencias' }, 'Ver o relatório diário'), ' · ', h('a', { href: '#/visao-geral' }, 'Indicadores gerais'), ' · ',
         h('a', { href: '#/prazos' }, 'Prazos em risco'), ' · ', h('a', { href: '#/solicitacoes' }, 'Solicitações')));
+    // modalidades (a tela de configurações é só da controladoria): lista aqui mesmo, só leitura
+    const secMod = h('section', { class: 'cartao', id: 'dir-modalidades', hidden: true });
+    corpo.append(secMod);
+    async function abrirModalidades(bt) {
+      const abrir = secMod.hidden; secMod.hidden = !abrir; bt.setAttribute('aria-expanded', String(abrir));
+      if (!abrir) return;
+      secMod.textContent = ''; secMod.append(h('h2', {}, 'Modalidades padronizadas ativas'), h('p', { class: 'sutil' }, 'Carregando…'));
+      const { data: ms, error } = await ctx.sb.from('modalidades').select('nome, pontos, checklist, exige_peca, exige_parecer, link_treinamento').eq('ativa', true).order('nome');
+      secMod.lastChild.remove();
+      if (error) { secMod.append(aviso('erro', error.message)); return; }
+      secMod.append(h('p', { class: 'sutil' }, 'Tarefas dessas modalidades só podem ser concluídas no Atlas com o checklist e os anexos obrigatórios.'),
+        tabela([
+          { titulo: 'Modalidade', larga: true, valor: m => m.nome },
+          { titulo: 'Pontos', num: true, valor: m => num(m.pontos) },
+          { titulo: 'Itens do checklist', num: true, valor: m => num((m.checklist || []).length) },
+          { titulo: 'Anexos obrigatórios', valor: m => [m.exige_peca && 'peça', m.exige_parecer && 'parecer de autoavaliação'].filter(Boolean).join(' e ') || '—' },
+          { titulo: 'Treinamento', valor: m => m.link_treinamento ? link(m.link_treinamento, 'Abrir') : '—' }
+        ], ms || [], { compacta: true, vazio: 'Nenhuma modalidade ativa.' }));
+      secMod.scrollIntoView({ block: 'start', behavior: 'smooth' });
+    }
     const p = r.produtividade || {};
     corpo.append(h('section', { class: 'cartao' }, h('h2', {}, 'Produtividade no Atlas'),
       h('p', { class: 'sutil' }, p.coleta ? `Coleta de ${dataHora(p.coleta)}, período ${data(p.periodo && p.periodo.de)} a ${data(p.periodo && p.periodo.ate)} (mesmo cálculo da tela Produtividade do Atlas).`
@@ -218,6 +248,8 @@
     executada: 'Executada no Atlas', falhou: 'Falhou no Atlas', cancelada: 'Cancelada' };
   async function solicitacoes(raiz, ctx) {
     const podeSolicitar = ['admin', 'lider'].includes(papel(ctx));
+    let filtroSol = '';
+    try { filtroSol = sessionStorage.getItem('ctrl-sol-status') || ''; sessionStorage.removeItem('ctrl-sol-status'); } catch (e) { /* sem sessionStorage */ }
     const peticionador = papel(ctx) === 'colaborador';
     raiz.append(h('h1', {}, 'Solicitações e reagendamentos'),
       h('p', { class: 'sutil' }, 'O líder pede uma tarefa nova ou um reagendamento. Antes de enviar, o sistema analisa a pauta do advogado (prazos internos e processuais, ',
@@ -353,9 +385,12 @@
     async function desenharLista() {
       lista.textContent = ''; lista.append(h('h2', {}, 'Solicitações'), h('p', { class: 'sutil' }, 'Carregando…'));
       let itens;
-      try { itens = await rpc(ctx, 'solicitacoes_listar', { p_status: null, p_limite: 200 }); }
+      try { itens = await rpc(ctx, 'solicitacoes_listar', { p_status: filtroSol || null, p_limite: 200 }); }
       catch (e) { lista.textContent = ''; lista.append(aviso('erro', msgErro(e))); return; }
-      lista.textContent = ''; lista.append(h('h2', {}, 'Solicitações'));
+      lista.textContent = ''; lista.append(h('h2', {}, 'Solicitações'),
+        h('div', { class: 'filtros-barra' }, h('label', { class: 'filtro' }, h('span', {}, 'Situação'),
+          h('select', { 'aria-label': 'Situação das solicitações', onchange: e => { filtroSol = e.target.value; desenharLista(); } },
+            h('option', { value: '' }, 'Todas'), Object.entries(STATUS_SOL).map(([k, t]) => h('option', { value: k, selected: k === filtroSol }, t))))));
       const descr = s => s.tipo === 'nova_tarefa' ? `Tarefa nova: ${s.dados.titulo} (${data(s.dados.data)}${s.dados.prioridade === 'urgent' ? ', urgente' : ''})`
         : `Reagendar "${s.dados.compromisso}" de ${data(s.dados.data_atual)} para ${data(s.dados.nova_data || s.dados.data_atual)}${s.dados.novo_colaborador_id ? ' (troca de responsável)' : ''}`;
       lista.append(tabela([

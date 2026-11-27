@@ -346,6 +346,26 @@ a { color: var(--ouro-texto); }
   .marca-nome { color: #8a6116; }
 }
 
-/* Configurações › Usuários: definir senha (0062) */
+/* Workflows jurídicos (0061) */
+.wf-dados { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: .6rem 1.2rem; margin: .6rem 0; }
+.wf-dados > div > span { display: block; font-size: .78rem; }
+.wf-dados > div > strong { overflow-wrap: anywhere; }
+
+/* workflows recursais (0063) */
+.caixa-alerta { border-left: 4px solid var(--alerta); background: var(--alerta-fundo); }
+.wf-nao-aplica { margin-top: .5rem; }
+.wf-nao-aplica summary { cursor: pointer; color: var(--sutil); }
+
+/* intimações e diretoria (0064) */
+.kpi-link { text-decoration: none; cursor: pointer; }
+.kpi-link:hover .kpi-ir, .kpi-link:focus-visible .kpi-ir { text-decoration: underline; }
+.kpi-ir { font-size: .75rem; font-weight: 600; color: var(--primaria); margin-top: auto; }
+.barra-lote { align-items: center; flex-wrap: wrap; }
+.barra-lote input[type=text] { min-width: 16rem; }
+.lista-simples { margin: 0; padding-left: 1.1rem; }
+.lista-simples li { margin: .15rem 0; }
+.grade-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr)); gap: 1rem; }
+
+/* Configurações › Usuários: definir senha (0062 — senha pela controladoria) */
 .cf-senha > summary { white-space: nowrap; cursor: pointer; }
 .cf-senha[open] { display: flex; flex-direction: column; gap: .35rem; min-width: 12rem; }

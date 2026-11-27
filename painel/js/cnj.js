@@ -1,7 +1,10 @@
 /* Intimações CNJ (12/11/2026): comunicações capturadas na API pública do CNJ (DJEN), por OAB e por processo
  * da carteira (processos do Atlas + processos já conhecidos). Substitui o módulo de intimações do Atlas, que o
  * escritório decidiu não contratar. Cada comunicação mostra se a Webjur também capturou (identificador exato,
- * ou processo e data). Toda permissão é decidida no banco. */
+ * ou processo e data). Toda permissão é decidida no banco.
+ * 0064 (27/11/2026): a controladoria arquiva intimações já tratadas (lista "Arquivadas", motivo opcional, pode desarquivar);
+ * cada intimação mostra se o processo está no Atlas e, se não estiver, a situação do cadastro automático (área
+ * "Processos não cadastrados"). */
 (function () {
   'use strict';
   const { h, num, data, dataHora, aviso, tabela } = UI;
@@ -46,8 +49,9 @@
     const campo = (rot, el) => h('label', { class: 'filtro' }, h('span', {}, rot), el);
     const ini = h('input', { type: 'date', value: f.inicio }), fim = h('input', { type: 'date', value: f.fim });
     const busca = h('input', { type: 'search', placeholder: 'Processo, tribunal ou texto', 'aria-label': 'Buscar' });
-    const filtro = h('select', {}, h('option', { value: '' }, 'Todas'), h('option', { value: 'sem_webjur' }, 'Sem captura da Webjur'),
-      h('option', { value: 'com_webjur' }, 'Capturadas pela Webjur'));
+    const filtro = h('select', {}, h('option', { value: '' }, 'Pendentes (não arquivadas)'), h('option', { value: 'sem_webjur' }, 'Sem captura da Webjur'),
+      h('option', { value: 'com_webjur' }, 'Capturadas pela Webjur'), h('option', { value: 'fora_atlas' }, 'Processo fora do Atlas'),
+      h('option', { value: 'arquivadas' }, 'Arquivadas'));
     topo.append(h('form', { class: 'filtros-barra', onsubmit: e => { e.preventDefault(); f.inicio = ini.value; f.fim = fim.value; f.busca = busca.value; f.filtro = filtro.value; desenhar(); } },
       campo('Disponibilização de', ini), campo('até', fim), campo('Situação', filtro), campo('Busca', busca),
       h('button', { type: 'submit', class: 'btn btn-sec' }, 'Filtrar')));
@@ -61,31 +65,74 @@
         if (error) throw error; r = d;
       } catch (e) { corpo.textContent = ''; corpo.append(aviso('erro', msgErro(e))); return; }
       corpo.textContent = '';
-      const c = r.carteira, sem = r.itens.filter(i => !i.webjur).length;
+      const c = r.carteira, sem = r.itens.filter(i => !i.webjur).length, fora = r.itens.filter(i => !i.no_atlas).length;
+      const arquivadas = f.filtro === 'arquivadas';
+      const irFiltro = v => () => { f.filtro = v; filtro.value = v; desenhar(); };
       corpo.append(h('section', { class: 'kpis' },
-        kpi('Comunicações no período', num(r.itens.length)),
-        kpi('Sem captura da Webjur', num(sem), 'conferir', sem > 0),
+        kpi(arquivadas ? 'Arquivadas no período' : 'Comunicações pendentes', num(r.itens.length)),
+        kpi('Sem captura da Webjur', num(sem), 'conferir', sem > 0, irFiltro('sem_webjur')),
+        kpi('Processo fora do Atlas', num(fora), 'ver os processos não cadastrados', fora > 0, () => { location.hash = '#/nao-cadastrados'; }),
+        kpi('Arquivadas no período', num(r.arquivadas_periodo || 0), arquivadas ? 'voltar às pendentes' : 'ver as arquivadas', false,
+          irFiltro(arquivadas ? '' : 'arquivadas')),
         kpi('Processos na carteira', num(c.total), `${num(c.do_atlas)} do Atlas`),
         kpi('Consultados hoje', `${num(c.consultados_hoje)} de ${num(c.total)}`, c.com_falha ? `${num(c.com_falha)} com falha` : null, c.com_falha > 0)));
       if (r.execucoes.length) corpo.append(h('p', { class: 'sutil' }, 'Últimas execuções: ',
         r.execucoes.map(e => `${TIPO_EXEC[e.tipo] || e.tipo} em ${dataHora(e.inicio)} (${num(e.sucesso)} ok, ${num(e.falhas)} falha(s), ${num(e.novas)} nova(s))`).join(' · '), '.'));
       else corpo.append(aviso('alerta', 'A captura do CNJ ainda não rodou.'));
+      // seleção para arquivar / desarquivar (só a controladoria)
+      const marcados = new Set();
+      const admin = ehAdmin(ctx);
+      if (admin && r.itens.length) {
+        const mot = h('input', { type: 'text', placeholder: 'Motivo (opcional)', 'aria-label': 'Motivo do arquivamento', maxlength: 500 });
+        const msg = h('span', { class: 'erro', 'aria-live': 'polite' });
+        const conta = h('span', { class: 'sutil' }, 'Nenhuma selecionada.');
+        const bt = h('button', { type: 'button', class: 'btn btn-sec', onclick: async () => {
+          msg.textContent = '';
+          if (!marcados.size) { msg.textContent = 'Selecione as intimações na tabela.'; return; }
+          bt.disabled = true;
+          try {
+            const ids = [...marcados];
+            const x = arquivadas ? await rpc('cnj_desarquivar', { p_ids: ids }) : await rpc('cnj_arquivar', { p_ids: ids, p_motivo: mot.value || null });
+            desenhar(); void x;
+          } catch (e) { msg.textContent = msgErro(e); bt.disabled = false; }
+        } }, arquivadas ? 'Desarquivar selecionadas' : 'Arquivar selecionadas');
+        corpo.append(h('div', { class: 'acoes barra-lote' }, conta, arquivadas ? null : mot, bt, msg));
+        corpo._conta = n => { conta.textContent = n ? `${n} selecionada(s).` : 'Nenhuma selecionada.'; };
+      }
+      const caixa = i => h('input', { type: 'checkbox', 'aria-label': 'Selecionar a intimação de ' + data(i.data_disponibilizacao) + ' do processo ' + (i.cnj || ''),
+        onchange: e => { if (e.target.checked) marcados.add(i.id); else marcados.delete(i.id); if (corpo._conta) corpo._conta(marcados.size); } });
+      const tagAtlas = i => {
+        if (i.no_atlas) return h('span', { class: 'tag tag-ok' }, 'No Atlas');
+        const cad = i.cadastro;
+        const st = cad && cad.situacao;
+        const [t, cl] = st === 'cadastrado' ? ['Cadastrado agora', 'tag-ok'] : ['aprovado', 'enviando', 'previa'].includes(st) ? ['Cadastrando no Atlas', 'tag-neutra']
+          : st === 'revisar' ? ['Fora do Atlas: conferir cliente', 'tag-alerta'] : st === 'erro' ? ['Erro no cadastro', 'tag-erro']
+          : ['Fora do Atlas: escolher cliente', 'tag-erro'];
+        return h('a', { href: '#/nao-cadastrados', class: 'tag ' + cl, title: cad && cad.cliente ? 'Cliente: ' + cad.cliente : 'Abrir os processos não cadastrados' }, t);
+      };
       corpo.append(tabela([
+        ...(admin ? [{ titulo: '', valor: caixa }] : []),
         { titulo: 'Disponibilização', valor: i => data(i.data_disponibilizacao) },
         { titulo: 'Processo', valor: i => h('span', { class: 'nowrap' }, i.cnj || '—') },
         { titulo: 'Tribunal / órgão', valor: i => [i.tribunal, i.orgao].filter(Boolean).join(' — ') },
         { titulo: 'Tipo', valor: i => [i.tipo, i.documento].filter(Boolean).join(' · ') },
+        { titulo: 'Atlas', valor: tagAtlas },
         { titulo: 'Webjur', valor: i => i.webjur ? h('span', { class: 'tag tag-ok' }, i.webjur.exata ? 'Capturada' : 'Capturada (processo e data)')
                                                 : h('span', { class: 'tag tag-erro' }, 'Não capturada') },
         { titulo: 'Comunicação', larga: true, valor: i => h('details', {}, h('summary', {}, (i.texto || '').slice(0, 140) + ((i.texto || '').length > 140 ? '…' : '')),
             h('p', { class: 'teor-cnj' }, i.texto || ''),
             i.link ? h('p', {}, h('a', { href: i.link, target: '_blank', rel: 'noopener noreferrer' }, 'Certidão no CNJ')) : null,
             h('p', { class: 'sutil' }, 'Captura: ' + (i.encontrada_por || []).map(x => x === 'processo' ? 'varredura por processo' : x.replace('oab:', 'OAB ')).join(', ')
-              + (i.na_carteira ? '' : ' · processo fora da carteira'))) }
-      ], r.itens, { compacta: true, vazio: 'Nenhuma comunicação no período.', classeLinha: i => i.webjur ? null : 'linha-alerta' }));
+              + (i.na_carteira ? '' : ' · processo fora da carteira')),
+            i.arquivada ? h('p', { class: 'nota' }, `Arquivada em ${dataHora(i.arquivada.em)}` + (i.arquivada.por ? ` por ${i.arquivada.por}` : '')
+              + (i.arquivada.motivo ? `: ${i.arquivada.motivo}` : '.')) : null) }
+      ], r.itens, { compacta: true, vazio: arquivadas ? 'Nenhuma intimação arquivada no período.' : 'Nenhuma comunicação pendente no período.',
+         classeLinha: i => i.webjur || i.arquivada ? null : 'linha-alerta' }));
     }
-    const kpi = (rotulo, valor, desc, atencao) => h('div', { class: 'kpi' + (atencao ? ' kpi-atencao' : '') },
+    const kpi = (rotulo, valor, desc, atencao, acao) => h(acao ? 'button' : 'div', { class: 'kpi' + (acao ? '' : ' kpi-estatico') + (atencao ? ' kpi-atencao' : ''),
+      ...(acao ? { type: 'button', onclick: acao } : {}) },
       h('span', { class: 'kpi-rotulo' }, rotulo), h('span', { class: 'kpi-valor' }, valor), desc ? h('span', { class: 'kpi-desc' }, desc) : null);
+    const rpc = async (fn, args) => { const { data: d, error } = await ctx.sb.rpc(fn, args); if (error) throw new Error(error.message); return d; };
     desenhar();
   }
 

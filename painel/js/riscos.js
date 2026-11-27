@@ -61,13 +61,15 @@
                 ? h('button', { type: 'button', class: 'btn btn-sec btn-peq', title: 'Exceção: a tarefa pode ser entregue depois do D-4',
                     onclick: ev => excecaoD4(ev.target, l.tarefa_id, true) }, 'Autorizar após o D-4') : null) }] : [])
         ], r.linhas, { compacta: true, vazio: 'Nenhum alerta com esses filtros.' }));
-      if (autorizaD4) await listarExcecoes();
+      if (autorizaD4 || ctx.perfil.papel === 'diretoria') await listarExcecoes();   // 0064: a diretoria também vê (só leitura)
+      let rolar = null; try { rolar = sessionStorage.getItem('ctrl-rolar'); sessionStorage.removeItem('ctrl-rolar'); } catch (e) { /* */ }
+      if (rolar === 'excecoes-d4') { const alvo = document.getElementById('excecoes-d4'); if (alvo) alvo.scrollIntoView({ block: 'start' }); }
     }
     // 0037: exceções de D-4 (entregas autorizadas depois do D-4). Saem dos alertas de D-4; o PF Judicial continua valendo.
     async function listarExcecoes() {
       const { data: lista, error } = await ctx.sb.rpc('excecoes_d4_listar');
       if (!error && !(lista || []).length) return;     // seção aparece só quando há exceção ativa
-      corpo.append(h('h2', { class: 'secao' }, 'Entregas autorizadas depois do D-4'),
+      corpo.append(h('h2', { class: 'secao', id: 'excecoes-d4' }, 'Entregas autorizadas depois do D-4'),
         h('p', { class: 'sutil' }, 'Exceções marcadas por líder ou pela controladoria, com justificativa. Essas tarefas saem dos alertas de D-4; o PF Judicial continua valendo.'));
       if (error) { corpo.append(aviso('erro', error.message)); return; }
       corpo.append(tabela([
