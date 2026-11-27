@@ -129,13 +129,19 @@
         { titulo: 'Atlas', valor: tagAtlas },
         { titulo: 'Webjur', valor: i => i.webjur ? h('span', { class: 'tag tag-ok' }, i.webjur.exata ? 'Capturada' : 'Capturada (processo e data)')
                                                 : h('span', { class: 'tag tag-erro' }, 'Não capturada') },
-        { titulo: 'Comunicação', larga: true, valor: i => h('details', {}, h('summary', {}, (i.texto || '').slice(0, 140) + ((i.texto || '').length > 140 ? '…' : '')),
-            h('p', { class: 'teor-cnj' }, i.texto || ''),
-            i.link ? h('p', {}, h('a', { href: i.link, target: '_blank', rel: 'noopener noreferrer' }, 'Certidão no CNJ')) : null,
+        { titulo: 'Comunicação', larga: true, valor: i => { const t = UI.textoLegivel(i.texto); const linhas = t.split('\n');
+          // resumo: o ato (ex.: ATO ORDINATÓRIO, DESPACHO) e o começo do corpo, sem o cabeçalho de partes
+          const corpoIni = linhas.findIndex(l => !/^[A-ZÀ-Ú()\/ ]{3,40}:/.test(l) && !/^[A-ZÀ-Ú ]+ N[ºo°] /.test(l));
+          const resumo = linhas.slice(corpoIni < 0 ? 0 : corpoIni).join(' · ');
+          const soEventos = /refere-se aos seguintes eventos/i.test(t);
+          return h('details', {}, h('summary', {}, resumo.slice(0, 160) + (resumo.length > 160 ? '…' : '')),
+            h('div', { class: 'teor-cnj' }, linhas.map(l => h('p', { class: /^[A-ZÀ-Ú()\/ ]{3,40}:/.test(l) ? 'teor-cab' : null }, l))),
+            soEventos ? h('p', { class: 'nota' }, 'Esta comunicação só cita os eventos do processo (padrão do eproc). O inteiro teor do ato está no documento do tribunal: abra a certidão abaixo.') : null,
+            i.link ? h('p', {}, h('a', { href: i.link, target: '_blank', rel: 'noopener noreferrer' }, soEventos ? 'Abrir o documento no tribunal' : 'Certidão no CNJ')) : null,
             h('p', { class: 'sutil' }, 'Captura: ' + (i.encontrada_por || []).map(x => x === 'processo' ? 'varredura por processo' : x.replace('oab:', 'OAB ')).join(', ')
               + (i.na_carteira ? '' : ' · processo fora da carteira')),
             i.arquivada ? h('p', { class: 'nota' }, `Arquivada em ${dataHora(i.arquivada.em)}` + (i.arquivada.por ? ` por ${i.arquivada.por}` : '')
-              + (i.arquivada.motivo ? `: ${i.arquivada.motivo}` : '.')) : null) }
+              + (i.arquivada.motivo ? `: ${i.arquivada.motivo}` : '.')) : null); } }
       ], r.itens, { compacta: true, vazio: arquivadas ? 'Nenhuma intimação arquivada no período.' : 'Nenhuma comunicação pendente no período.',
          classeLinha: i => i.webjur || i.arquivada ? null : 'linha-alerta' }));
     }

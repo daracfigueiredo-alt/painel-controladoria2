@@ -283,6 +283,7 @@
     el.modelo.addEventListener('change', trocarModelo);
     caixaDecisao.append(campo('Tipo de decisão', el.tipo_decisao), campo('Resultado', el.resultado));
     const dica = h('p', { class: 'sutil', 'aria-live': 'polite' }), m = h('p', { class: 'erro', 'aria-live': 'polite' });
+    const teor = h('div');   // inteiro teor da intimação (texto legível), mostrado na triagem
     const btBuscar = h('button', { type: 'button', class: 'btn btn-sec btn-peq', onclick: async () => {
       m.textContent = ''; dica.textContent = '';
       if (el.origem_tipo.value === 'manual' || !el.origem_id.value.trim()) { m.textContent = 'Escolha a origem e informe o identificador da intimação.'; return; }
@@ -293,7 +294,12 @@
         caixa.dataset.lawsuit = r.atlas_lawsuit_id || ''; caixa.dataset.client = r.atlas_client_id || '';
         dica.textContent = (r.fluxo_ativo ? `Atenção: esta intimação já tem o fluxo #${r.fluxo_ativo} ativo. ` : '')
           + (r.atlas_lawsuit_id ? 'Processo encontrado no Atlas: as tarefas serão vinculadas a ele. ' : 'Processo não encontrado no Atlas: as tarefas sairão sem vínculo com o processo. ')
-          + (r.resumo ? 'Resumo: ' + r.resumo : '');
+          + (r.resumo ? '' : 'A intimação não trouxe texto.');
+        teor.textContent = '';
+        if (r.resumo) teor.append(h('details', { class: 'caixa', open: true }, h('summary', {}, h('strong', {}, 'Inteiro teor da intimação')),
+          h('div', { class: 'teor-cnj' }, UI.textoLegivel(r.resumo).split('\n').map(l => h('p', { class: /^[A-ZÀ-Ú()\/ ]{3,40}:/.test(l) ? 'teor-cab' : null }, l))),
+          /refere-se aos seguintes eventos/i.test(r.resumo) && r.link_intimacao ? h('p', { class: 'nota' }, 'A comunicação só cita os eventos (eproc). O inteiro teor do ato está no ',
+            h('a', { href: r.link_intimacao, target: '_blank', rel: 'noopener noreferrer' }, 'documento do tribunal'), '.') : null));
       } catch (e) { m.textContent = msgErro(e); }
     } }, 'Buscar dados da intimação');
     const btSugerir = h('button', { type: 'button', class: 'btn btn-sec btn-peq', onclick: async () => {
@@ -327,7 +333,7 @@
       h('h2', {}, 'Triagem da intimação'),
       h('p', { class: 'sutil' }, 'Campos obrigatórios da especificação. Com prazo judicial, o fluxo só abre com o PF validado (Regra 04). A mesma intimação não abre dois fluxos ativos (Regra 05).'),
       h('div', { class: 'filtros-barra' }, campo('Fluxo', el.modelo, true)), caixaDecisao,
-      h('div', { class: 'filtros-barra' }, campo('Origem', el.origem_tipo), campo('Identificador', el.origem_id), btBuscar), dica,
+      h('div', { class: 'filtros-barra' }, campo('Origem', el.origem_tipo), campo('Identificador', el.origem_id), btBuscar), dica, teor,
       h('div', { class: 'filtros-barra' }, campo('Processo (CNJ)', el.cnj), campo('Cliente', el.cliente, true)),
       h('div', { class: 'filtros-barra' }, campo('Equipe', el.equipe_id), campo('Advogado responsável', el.advogado_colaborador_id)),
       h('div', { class: 'filtros-barra' }, campo('Natureza da intimação', el.natureza), campo('Providência jurídica', el.providencia, true)),

@@ -26,5 +26,23 @@
     return h('div', { class: 'tab-rolagem' }, t);
   }
   function aviso(tipo, ...conteudo) { return h('div', { class: 'aviso aviso-' + tipo, role: tipo === 'erro' ? 'alert' : 'status' }, ...conteudo); }
-  window.UI = { h, dataHora, data, num, tabela, aviso };
+  // Comunicações do CNJ (DJEN) chegam, muitas vezes, como página HTML inteira (eproc, PJe). Converte em texto legível:
+  // um parágrafo por linha, cabeçalho em "RELATOR: …", sem estilos. O HTML é só LIDO (DOMParser não executa scripts
+  // nem carrega imagens) e nada dele entra na página como HTML: o resultado é texto puro.
+  const BLOCOS = 'p,div,center,tr,li,h1,h2,h3,h4,h5,h6,table,ul,ol,blockquote,section,article,header,footer';
+  function textoLegivel(bruto) {
+    if (!bruto) return '';
+    const s = String(bruto);
+    if (!/<[a-z!\/][^>]*>|&[a-z#0-9]+;/i.test(s)) return s.trim();
+    let doc;
+    try { doc = new DOMParser().parseFromString(s, 'text/html'); } catch (e) { return s; }
+    const raiz = doc.body || doc.documentElement;
+    raiz.querySelectorAll('script,style,head,title,meta,link,noscript').forEach(n => n.remove());
+    raiz.querySelectorAll('br').forEach(n => n.replaceWith('\n'));
+    raiz.querySelectorAll('td,th').forEach(n => n.append(' '));
+    raiz.querySelectorAll(BLOCOS).forEach(n => { n.prepend('\n'); n.append('\n'); });
+    return (raiz.textContent || '').replace(/\u00a0/g, ' ').split('\n')
+      .map(l => l.replace(/[ \t]+/g, ' ').replace(/ :/g, ':').trim()).filter(Boolean).join('\n');
+  }
+  window.UI = { h, dataHora, data, num, tabela, aviso, textoLegivel };
 })();

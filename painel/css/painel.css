@@ -373,3 +373,8 @@ a { color: var(--ouro-texto); }
 /* 0065: etiqueta clicável (fluxo da intimação) */
 button.tag-botao { border: 0; cursor: pointer; font-family: inherit; }
 button.tag-botao:hover { text-decoration: underline; text-underline-offset: 2px; }
+
+/* teor das comunicações do CNJ convertido de HTML em texto (27/11/2026) */
+.teor-cnj { white-space: normal; }
+.teor-cnj p { margin: .25rem 0; }
+.teor-cnj p.teor-cab { margin: 0; font-size: .85rem; color: var(--sutil); }
