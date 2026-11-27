@@ -11,6 +11,8 @@
 //   padronizar_descricoes -> grava no Atlas o bloco padrão da controladoria na descrição (0039),
 //                    preservando o texto original (só tarefas de modalidade ATIVA)
 //   sincronizar_intimacoes -> espelha as intimações e prazos do Atlas (list_deadlines) (0041)
+//   workflows      -> ciclo dos workflows (0061): lê no Atlas as etapas concluídas, libera as seguintes e
+//                    cria no Atlas as etapas liberadas (create_task com Idempotency-Key). Também pelo agendamento.
 //   fim_expediente -> rotina do fim do expediente (0041/0042): tarefas + intimações + produtividade
 //                    + double check Webjur × Atlas + relatório diário. Só LÊ o Atlas.
 //                    Também pode ser chamada pelo agendamento (pg_cron), com o segredo CRON_SECRET:
@@ -113,7 +115,11 @@ async function sincronizar(token: string) {
   }
   // 0058: tarefa "em andamento" no Atlas conta como início da tratativa (controladoria, 17/11/2026)
   const andamento = await rpc(token, 'atlas_registrar_em_andamento', { p_lote: lote });
+  // 0061: etapas de workflow concluídas no Atlas (rede de segurança do ciclo de 10 minutos)
+  let wf: any = null;
+  try { wf = await rpc(token, 'wf_registrar_atlas', { p_itens: concluidas.map(t => ({ id: t.id, status: t.status })) }); } catch { /* sem 0061 */ }
   return {
+    workflows_concluidas: wf?.concluidas ?? 0,
     inicios_por_andamento: andamento?.registrados ?? 0,
     lote_id: lote, tarefas: tarefas.length, abertas: abertas.length, concluidas_recentes: concluidas.length,
     novas: resultados.reduce((s, r) => s + (r.tarefas_novas ?? 0), 0),
@@ -197,6 +203,46 @@ async function padronizarDescricoes(token: string, limite: number) {
   return r;
 }
 
+// 0061: ciclo dos workflows
+const CODIGOS_PARAR = new Set(['permission_denied', 'invalid_api_key', 'missing_api_key', 'read_only_key', 'api_not_in_plan', 'tenant_inactive', 'sem_chave']);
+async function cicloWorkflows(token: string, origem: string) {
+  const inicio = new Date();
+  const r: Record<string, unknown> = { lidas: 0, concluidas: 0, criadas: 0, erros: 0, ligado: false };
+  try {
+    const acomp = await rpc(token, 'wf_acompanhar', {});
+    if (acomp?.abertas > 0 && acomp?.desde) {
+      const feitas = await todasAsPaginas({ status: ['done'], updatedSince: new Date(acomp.desde).toISOString() });
+      r.lidas = feitas.length;
+      const x = await rpc(token, 'wf_registrar_atlas', { p_itens: feitas.map(t => ({ id: t.id, status: t.status })) });
+      r.concluidas = x?.concluidas ?? 0;
+    }
+    r.leitura_ok = true;
+  } catch (e) { r.erro_leitura = (e as Error).message; }
+  // até 3 rodadas de 20; depois de um erro não há nova rodada (a etapa que falhou volta no próximo ciclo,
+  // em vez de gastar tentativas seguidas com o mesmo erro)
+  let parar = false;
+  for (let rodada = 0; rodada < 3 && !parar; rodada++) {
+    const plano = await rpc(token, 'wf_para_criar', { p_limite: 20 });
+    r.ligado = !!plano?.ligado;
+    if (!plano?.ligado || !plano.tarefas?.length) break;
+    if (plano.tarefas.length < 20) parar = true;
+    for (const t of plano.tarefas) {
+      try {
+        const j = await atlas('create_task', t.payload, 1, t.idempotencia);
+        await rpc(token, 'wf_confirmar_criacao', { p_tarefa: t.id, p_tentativa: t.tentativa, p_resposta: j });
+        (r.criadas as number)++;
+      } catch (e) {
+        const err = e as ErroAtlas;
+        (r.erros as number)++; r.ultimo_erro = err.message; parar = true;
+        try { await rpc(token, 'wf_falha_criacao', { p_tarefa: t.id, p_erro: err.message, p_code: err.code ?? null }); } catch { /* fica em "criando" e o banco passa a "verificar" depois */ }
+        if (CODIGOS_PARAR.has(err.code) || err.status === 401 || err.status === 403) { parar = true; break; }
+      }
+    }
+  }
+  await rpc(token, 'wf_registrar_ciclo', { p_inicio: inicio.toISOString(), p_origem: origem, p_resultado: r });
+  return { ...r, segundos: Math.round((Date.now() - inicio.getTime()) / 1000) };
+}
+
 async function fimExpediente(token: string) {
   const etapas: Record<string, unknown> = {};
   const passo = async (nome: string, fn: () => Promise<unknown>) => {
@@ -222,7 +268,7 @@ Deno.serve(async req => {
   let token = req.headers.get('Authorization') ?? '';
   if (!token.startsWith('Bearer ')) return resp(401, { erro: 'Faça login no painel.' });
   let corpo: any = {}; try { corpo = await req.json(); } catch { return resp(400, { erro: 'JSON inválido' }); }
-  // rotina agendada: segredo próprio + chave de serviço (só a ação fim_expediente)
+  // rotina agendada: segredo próprio + chave de serviço (só as ações fim_expediente e workflows)
   // trim: espaço ou quebra de linha colados junto com o valor não devem impedir a rotina
   const segredo = (Deno.env.get('CRON_SECRET') ?? '').trim();
   const cron = (req.headers.get('x-cron-secret') ?? '').trim();
@@ -230,7 +276,7 @@ Deno.serve(async req => {
     // o motivo ajuda a configurar sem nunca devolver o valor do segredo
     const motivo = !segredo ? 'segredo CRON_SECRET não configurado na função'
       : !SB_SERVICO ? 'chave de serviço indisponível na função'
-      : corpo.acao !== 'fim_expediente' ? 'ação não permitida para o agendamento'
+      : !['fim_expediente', 'workflows'].includes(corpo.acao) ? 'ação não permitida para o agendamento'
       : !iguais(cron, segredo) ? 'segredo diferente do guardado no Vault' : '';
     if (motivo) return resp(401, { erro: 'Agendamento não autorizado.', motivo });
     token = `Bearer ${SB_SERVICO}`;
@@ -266,6 +312,11 @@ Deno.serve(async req => {
     if (corpo.acao === 'sincronizar_intimacoes') {
       const r = await sincronizarIntimacoes(token);
       await rpc(token, 'atlas_registrar', { p_operacao: 'sincronizar_intimacoes', p_nivel: 'info', p_detalhe: r });
+      return resp(200, { ok: true, ...r });
+    }
+    if (corpo.acao === 'workflows') {
+      const r = await cicloWorkflows(token, cron !== '' ? 'agendamento' : 'painel');
+      if ((r.erros as number) > 0 || r.erro_leitura) await rpc(token, 'atlas_registrar', { p_operacao: 'workflows', p_nivel: 'aviso', p_detalhe: r });
       return resp(200, { ok: true, ...r });
     }
     if (corpo.acao === 'fim_expediente') {
