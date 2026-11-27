@@ -192,8 +192,12 @@
     const { data: d, error } = await ctx.sb.rpc('pub_listar', { p_inicio: filtros.inicio, p_fim: filtros.fim, p_busca: filtros.busca || null,
       p_situacao: filtros.situacao || null, p_origem: filtros.origem || null, p_limite: 500 });
     if (meu !== seq) return;
+    if (error) { corpo.textContent = ''; corpo.append(aviso('erro', error.message)); return; }
+    // tratamento (0065): fluxo de workflow aberto a partir de cada publicação
+    const fluxos = await window.Workflows.fluxosPorOrigem(ctx, 'webjur', d.linhas.map(p => p.id));
+    if (meu !== seq) return;
     corpo.textContent = '';
-    if (error) { corpo.append(aviso('erro', error.message)); return; }
+    if (fluxos._erro) corpo.append(aviso('alerta', 'Não foi possível ler o tratamento das publicações: ' + fluxos._erro));
     const ps = Object.entries(d.por_situacao || {});
     corpo.append(h('p', { class: 'sutil', id: 'pub-total' }, d.total > d.linhas.length ? `Mostrando ${num(d.linhas.length)} de ${num(d.total)} publicações.` : `${num(d.total)} publicação(ões).`,
       ps.length ? ' ' + ps.map(([k, n]) => `${SITUACAO[k] || k}: ${num(n)}`).join(' · ') + '.' : ''));
@@ -203,6 +207,9 @@
       { titulo: 'Processo', valor: p => h('button', { type: 'button', class: 'link pub-abrir nowrap', onclick: () => detalhar(p.id) },
           p.cnj || p.cnj_original || 'sem número') },
       { titulo: 'Tribunal / órgão', valor: p => [p.tribunal, p.orgao_julgador].filter(Boolean).join(' — ') || '—' },
+      { titulo: 'Tratamento', valor: p => window.Workflows.celulaTratamento(ctx, fluxos[String(p.id)], {
+          origem_tipo: 'webjur', origem_id: p.id,
+          titulo: [p.cnj || p.cnj_original, data(p.data_disponibilizacao), p.tribunal].filter(Boolean).join(' — ') }, ctx.perfil.papel === 'admin', () => listar()) },
       { titulo: 'Início do teor', larga: true, valor: p => p.teor_inicio + (p.teor_inicio.length >= 280 ? '…' : '') },
       { titulo: 'Fontes', valor: p => (p.origens || '').split(',').filter(Boolean).map(o => ORIGEM[o] || o).join(', ') + (p.n_coletas > 1 ? ` (${p.n_coletas}×)` : '') },
       { titulo: 'Conferência', valor: p => SITUACAO[p.situacao_conferencia || 'sem_conferencia'] },

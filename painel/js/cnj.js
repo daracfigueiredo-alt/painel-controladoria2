@@ -64,12 +64,16 @@
                                                                      p_filtro: f.filtro || null, p_limite: 1000 });
         if (error) throw error; r = d;
       } catch (e) { corpo.textContent = ''; corpo.append(aviso('erro', msgErro(e))); return; }
+      // tratamento (0065): fluxo de workflow aberto a partir de cada intimação
+      const fluxos = await window.Workflows.fluxosPorOrigem(ctx, 'cnj', r.itens.map(i => i.id));
       corpo.textContent = '';
       const c = r.carteira, sem = r.itens.filter(i => !i.webjur).length, fora = r.itens.filter(i => !i.no_atlas).length;
       const arquivadas = f.filtro === 'arquivadas';
+      const semTratamento = r.itens.filter(i => !fluxos[String(i.id)]).length;
       const irFiltro = v => () => { f.filtro = v; filtro.value = v; desenhar(); };
       corpo.append(h('section', { class: 'kpis' },
         kpi(arquivadas ? 'Arquivadas no período' : 'Comunicações pendentes', num(r.itens.length)),
+        kpi('Sem tratamento', num(semTratamento), 'sem fluxo aberto', !arquivadas && semTratamento > 0),
         kpi('Sem captura da Webjur', num(sem), 'conferir', sem > 0, irFiltro('sem_webjur')),
         kpi('Processo fora do Atlas', num(fora), 'ver os processos não cadastrados', fora > 0, () => { location.hash = '#/nao-cadastrados'; }),
         kpi('Arquivadas no período', num(r.arquivadas_periodo || 0), arquivadas ? 'voltar às pendentes' : 'ver as arquivadas', false,
@@ -79,6 +83,9 @@
       if (r.execucoes.length) corpo.append(h('p', { class: 'sutil' }, 'Últimas execuções: ',
         r.execucoes.map(e => `${TIPO_EXEC[e.tipo] || e.tipo} em ${dataHora(e.inicio)} (${num(e.sucesso)} ok, ${num(e.falhas)} falha(s), ${num(e.novas)} nova(s))`).join(' · '), '.'));
       else corpo.append(aviso('alerta', 'A captura do CNJ ainda não rodou.'));
+      if (fluxos._erro) corpo.append(aviso('alerta', 'Não foi possível ler o tratamento das intimações: ' + fluxos._erro));
+      else if (ehAdmin(ctx) && !arquivadas) corpo.append(h('p', { class: 'sutil' }, 'Clique em "Tratar" para abrir o workflow da intimação: a triagem já vem com processo, cliente, equipe, data e link. ',
+        'Depois de tratada, a intimação mostra o fluxo; ela pode ser arquivada quando o fluxo terminar.'));
       // seleção para arquivar / desarquivar (só a controladoria)
       const marcados = new Set();
       const admin = ehAdmin(ctx);
@@ -116,6 +123,9 @@
         { titulo: 'Processo', valor: i => h('span', { class: 'nowrap' }, i.cnj || '—') },
         { titulo: 'Tribunal / órgão', valor: i => [i.tribunal, i.orgao].filter(Boolean).join(' — ') },
         { titulo: 'Tipo', valor: i => [i.tipo, i.documento].filter(Boolean).join(' · ') },
+        { titulo: 'Tratamento', valor: i => window.Workflows.celulaTratamento(ctx, fluxos[String(i.id)], {
+            origem_tipo: 'cnj', origem_id: i.id, modalidade: 'DJEN',
+            titulo: [i.cnj, data(i.data_disponibilizacao), [i.tipo, i.documento].filter(Boolean).join(' · ')].filter(Boolean).join(' — ') }, admin && !i.arquivada, () => desenhar()) },
         { titulo: 'Atlas', valor: tagAtlas },
         { titulo: 'Webjur', valor: i => i.webjur ? h('span', { class: 'tag tag-ok' }, i.webjur.exata ? 'Capturada' : 'Capturada (processo e data)')
                                                 : h('span', { class: 'tag tag-erro' }, 'Não capturada') },

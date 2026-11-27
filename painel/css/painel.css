@@ -369,3 +369,7 @@ a { color: var(--ouro-texto); }
 /* Configurações › Usuários: definir senha (0062 — senha pela controladoria) */
 .cf-senha > summary { white-space: nowrap; cursor: pointer; }
 .cf-senha[open] { display: flex; flex-direction: column; gap: .35rem; min-width: 12rem; }
+
+/* 0065: etiqueta clicável (fluxo da intimação) */
+button.tag-botao { border: 0; cursor: pointer; font-family: inherit; }
+button.tag-botao:hover { text-decoration: underline; text-underline-offset: 2px; }

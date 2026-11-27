@@ -56,9 +56,12 @@
         } catch (e) { saida.append(aviso('erro', msgErro(e))); }
         btCiclo.disabled = false; desenhar();
       } }, 'Rodar o ciclo agora');
-      const btNova = h('button', { type: 'button', class: 'btn', onclick: () => { triagem.hidden = !triagem.hidden; if (!triagem.hidden && !triagem.firstChild) formTriagem(triagem, ctx, id => { triagem.hidden = true; abrirDetalhe(id); }); } }, 'Nova triagem');
+      const btNova = h('button', { type: 'button', class: 'btn btn-sec', onclick: () => { triagem.hidden = !triagem.hidden; if (!triagem.hidden && !triagem.firstChild) formTriagem(triagem, ctx, id => { triagem.hidden = true; abrirDetalhe(id); }); } }, 'Lançamento manual');
       triagem.hidden = true;
-      topo.append(h('div', { class: 'acoes' }, btNova, btCiclo), saida);
+      topo.append(aviso('info', 'Para tratar uma intimação, use o botão "Tratar" na lista de ', h('a', { href: '#/intimacoes-cnj' }, 'Intimações CNJ'), ' ou de ',
+          h('a', { href: '#/publicacoes' }, 'Publicações Webjur'), ': a triagem já abre com os dados da intimação. ',
+          'Aqui ficam o acompanhamento dos fluxos, as decisões dos advogados, a configuração das equipes e o lançamento manual (intimação que não está nas listas).'),
+        h('div', { class: 'acoes' }, btNova, btCiclo), saida);
     } else topo.append(saida);
 
     const selSt = h('select', {}, h('option', { value: 'ativo' }, 'Ativos'), h('option', { value: 'concluido' }, 'Concluídos'),
@@ -134,7 +137,7 @@
     }
 
     if (admin) desenharConfig(config, ctx);
-    desenhar();
+    if (fluxoPedido) { const id = fluxoPedido; fluxoPedido = null; abrirDetalhe(id); } else desenhar();
   }
   const TIPO_DECISAO = { sentenca: 'Sentença', interlocutoria: 'Decisão interlocutória', acordao: 'Acórdão', monocratica: 'Decisão monocrática', outra: 'Outra' };
   const RESULTADO = { favoravel: 'Favorável', parcialmente_favoravel: 'Parcialmente favorável', desfavoravel: 'Desfavorável' };
@@ -235,7 +238,9 @@
   }
 
   // ------------------------------------------------------------ triagem (seção 1.2 da especificação)
-  async function formTriagem(caixa, ctx, aoCriar) {
+  // pre (0065, 27/11/2026): { origem_tipo, origem_id } quando a triagem nasce de uma intimação da lista (CNJ ou Webjur):
+  // a origem já vem escolhida e os dados são buscados sozinhos.
+  async function formTriagem(caixa, ctx, aoCriar, pre) {
     let cfg;
     try { cfg = await rpc(ctx, 'wf_configuracao'); } catch (e) { caixa.append(aviso('erro', msgErro(e))); return; }
     const sel = (lista, rot) => h('select', {}, h('option', { value: '' }, rot), lista.map(x => h('option', { value: x.id }, x.nome)));
@@ -334,6 +339,49 @@
       h('p', {}, h('strong', {}, 'Decisões já conhecidas na triagem (opcional)')), caixaPerg,
       h('div', { class: 'acoes' }, btCriar), m));
     trocarModelo();
+    if (pre && pre.origem_tipo && pre.origem_id) {
+      el.origem_tipo.value = pre.origem_tipo; el.origem_id.value = String(pre.origem_id);
+      el.origem_tipo.disabled = true; el.origem_id.readOnly = true;
+      if (pre.modalidade) el.modalidade_intimacao.value = pre.modalidade;
+      btBuscar.click();
+    }
+  }
+
+  // Tratar uma intimação a partir das listas (Intimações CNJ, Publicações Webjur): triagem numa janela, já com os dados.
+  let dlgTratar = null;
+  function tratar(ctx, pre, aoCriar) {
+    if (!dlgTratar) { dlgTratar = h('dialog', { class: 'detalhe', 'aria-labelledby': 'wf-tratar-titulo' }); document.body.append(dlgTratar); }
+    dlgTratar.textContent = '';
+    const corpo = h('div', { class: 'detalhe-corpo' });
+    dlgTratar.append(h('div', { class: 'detalhe-topo' },
+      h('div', {}, h('h2', { id: 'wf-tratar-titulo' }, 'Tratar intimação'), h('p', { class: 'sutil' }, pre.titulo || '')),
+      h('button', { type: 'button', class: 'btn btn-sec btn-peq', onclick: () => dlgTratar.close() }, 'Fechar')), corpo);
+    dlgTratar.showModal();
+    formTriagem(corpo, ctx, id => {
+      corpo.textContent = '';
+      corpo.append(aviso('ok', `Fluxo #${id} aberto. A primeira tarefa vai para o Atlas no próximo ciclo (até 10 minutos).`),
+        h('div', { class: 'acoes' }, h('button', { type: 'button', class: 'btn', onclick: () => { dlgTratar.close(); abrirFluxo(id); } }, 'Ver o fluxo'),
+          h('button', { type: 'button', class: 'btn btn-sec', onclick: () => dlgTratar.close() }, 'Continuar na lista')));
+      if (aoCriar) aoCriar(id);
+    }, pre);
+  }
+
+  // abre a área de Workflows já no detalhe de um fluxo
+  let fluxoPedido = null;
+  function abrirFluxo(id) { fluxoPedido = id; if (location.hash === '#/workflows') window.dispatchEvent(new HashChangeEvent('hashchange')); else location.hash = '#/workflows'; }
+
+  // situação de tratamento de cada intimação de uma lista: { origem_id: { id, status, modelo } }
+  async function fluxosPorOrigem(ctx, tipo, ids) {
+    if (!ids.length) return {};
+    try { return await rpc(ctx, 'wf_fluxos_por_origem', { p_origem_tipo: tipo, p_ids: ids.map(String) }) || {}; }
+    catch (e) { return { _erro: msgErro(e) }; }
+  }
+  // célula "Tratamento" das listas de intimações
+  function celulaTratamento(ctx, fluxo, pre, admin, aoCriar) {
+    if (fluxo) return h('button', { type: 'button', class: 'tag tag-botao ' + (fluxo.status === 'ativo' ? 'tag-ok' : 'tag-neutra'), title: fluxo.modelo || '',
+      onclick: () => abrirFluxo(fluxo.id) }, `Fluxo #${fluxo.id} · ${FLUXO[fluxo.status] || fluxo.status}`);
+    if (!admin) return h('span', { class: 'tag tag-alerta' }, 'Sem tratamento');
+    return h('button', { type: 'button', class: 'btn btn-peq', onclick: () => tratar(ctx, pre, aoCriar) }, 'Tratar');
   }
 
   // ------------------------------------------------------------ assistentes das equipes
@@ -373,5 +421,5 @@
         h('tbody', {}, linhas)))));
   }
 
-  window.Workflows = { abrir };
+  window.Workflows = { abrir, tratar, abrirFluxo, fluxosPorOrigem, celulaTratamento };
 })();
