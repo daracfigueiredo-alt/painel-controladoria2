@@ -268,9 +268,10 @@
     const caixaPerg = h('div', { class: 'filtros-barra' }), caixaDecisao = h('div', { class: 'filtros-barra' });
     // Natureza e providência só no fluxo geral (MESTRE): tarefas sem workflow próprio, como especificação de provas,
     // alegações finais, memoriais, manifestação complexa e impugnação. Nos fluxos de decisão e de recurso a peça já vem do fluxo.
-    const linhaNatureza = h('div', {},
-      h('p', { class: 'nota' }, 'Para tarefas sem workflow próprio (especificação de provas, alegações finais, memoriais, manifestação complexa, impugnação etc.): descreva a natureza e a providência.'),
-      h('div', { class: 'filtros-barra' }, campo('Natureza da intimação', el.natureza), campo('Providência jurídica', el.providencia, true)));
+    const linhaNatureza = h('div', { class: 'filtros-barra wf-bloco' },
+      h('p', { class: 'wf-dica' }, h('strong', {}, 'Tarefa sem workflow próprio? '),
+        'Em especificação de provas, alegações finais, memoriais, manifestação complexa, impugnação e casos parecidos, descreva a natureza da intimação e a providência que ela pede.'),
+      campo('Natureza da intimação', el.natureza, true), campo('Providência jurídica', el.providencia, true));
     const modeloAtual = () => (cfg.modelos_entrada || []).find(x => x.codigo === el.modelo.value) || { codigo: 'MESTRE', perguntas: cfg.perguntas_mestre };
     const trocarModelo = () => {
       const mo = modeloAtual(); decisoes = {}; caixaPerg.textContent = '';
@@ -324,7 +325,7 @@
     } }, 'Sugerir PF');
     el.tem_prazo.addEventListener('change', () => { el.pf.disabled = !el.tem_prazo.checked; el.prazo_legal_dias.disabled = !el.tem_prazo.checked; btSugerir.hidden = !el.tem_prazo.checked; });
     const btCriar = h('button', { type: 'submit', class: 'btn' }, 'Abrir o fluxo');
-    caixa.append(h('form', { class: 'cartao', onsubmit: async ev => {
+    caixa.append(h('form', { class: 'cartao wf-triagem', onsubmit: async ev => {
       ev.preventDefault(); m.textContent = '';
       const campos = {
         modelo: el.modelo.value, prazo_em_dobro: el.prazo_em_dobro.checked,

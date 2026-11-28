@@ -378,3 +378,21 @@ button.tag-botao:hover { text-decoration: underline; text-underline-offset: 2px;
 .teor-cnj { white-space: normal; }
 .teor-cnj p { margin: .25rem 0; }
 .teor-cnj p.teor-cab { margin: 0; font-size: .85rem; color: var(--sutil); }
+
+/* Workflows: triagem com caixas harmônicas (28/11/2026) */
+.wf-triagem .filtros-barra { align-items: flex-end; }
+.wf-triagem .filtro { display: flex; flex-direction: column; gap: .3rem; }
+.wf-triagem .filtro input[type=text], .wf-triagem .filtro input[type=number], .wf-triagem .filtro input[type=url],
+.wf-triagem .filtro input[type=date], .wf-triagem .filtro select, .wf-triagem .filtro textarea {
+  font: inherit; font-size: .9rem; color: var(--texto); background: var(--superficie);
+  border: 1px solid var(--borda); border-radius: 6px; padding: .45rem .6rem; min-height: 2.35rem; box-sizing: border-box; }
+.wf-triagem .filtro input:focus-visible, .wf-triagem .filtro select:focus-visible, .wf-triagem .filtro textarea:focus-visible {
+  outline: 2px solid var(--ouro); outline-offset: 1px; border-color: var(--ouro); }
+.wf-triagem .filtro input::placeholder { color: var(--sutil); opacity: .8; }
+.wf-triagem .filtro-largo { flex: 1 1 18rem; }
+.wf-triagem .filtro-largo > input, .wf-triagem .filtro-largo > select { width: 100%; }
+.wf-triagem .wf-dica { flex: 1 0 100%; width: 100%; margin: 0 0 .25rem; max-width: none; box-sizing: border-box; font-size: .88rem; line-height: 1.5; color: var(--sutil);
+  padding: .5rem .75rem; border-left: 3px solid var(--ouro); background: var(--fundo, transparent); border-radius: 0 6px 6px 0; }
+.wf-triagem .wf-dica strong { color: var(--texto); }
+.wf-triagem .filtros-barra > .btn { min-height: 2.35rem; }
+.wf-triagem .filtro select { min-width: 12rem; }
