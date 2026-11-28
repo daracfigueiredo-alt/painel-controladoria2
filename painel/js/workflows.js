@@ -266,6 +266,11 @@
     };
     let decisoes = {};
     const caixaPerg = h('div', { class: 'filtros-barra' }), caixaDecisao = h('div', { class: 'filtros-barra' });
+    // Natureza e providência só no fluxo geral (MESTRE): tarefas sem workflow próprio, como especificação de provas,
+    // alegações finais, memoriais, manifestação complexa e impugnação. Nos fluxos de decisão e de recurso a peça já vem do fluxo.
+    const linhaNatureza = h('div', {},
+      h('p', { class: 'nota' }, 'Para tarefas sem workflow próprio (especificação de provas, alegações finais, memoriais, manifestação complexa, impugnação etc.): descreva a natureza e a providência.'),
+      h('div', { class: 'filtros-barra' }, campo('Natureza da intimação', el.natureza), campo('Providência jurídica', el.providencia, true)));
     const modeloAtual = () => (cfg.modelos_entrada || []).find(x => x.codigo === el.modelo.value) || { codigo: 'MESTRE', perguntas: cfg.perguntas_mestre };
     const trocarModelo = () => {
       const mo = modeloAtual(); decisoes = {}; caixaPerg.textContent = '';
@@ -276,8 +281,9 @@
       }));
       caixaPerg.hidden = !caixaPerg.childNodes.length;
       caixaDecisao.hidden = mo.codigo !== 'DECISAO';
+      linhaNatureza.hidden = mo.codigo !== 'MESTRE';
       el.providencia.placeholder = mo.nome_peca ? `Padrão: ${mo.nome_peca}` : (mo.codigo === 'DECISAO' ? 'Padrão: ANALISAR DECISÃO' : 'Ex.: EMENDA À INICIAL');
-      btSugerir.hidden = !mo.prazo_legal_dias;
+      // 0067: "Sugerir PF" em todos os fluxos; o prazo padrão do modelo (recursos) só preenche o campo
       if (mo.prazo_legal_dias) el.prazo_legal_dias.value = mo.prazo_legal_dias;
     };
     el.modelo.addEventListener('change', trocarModelo);
@@ -290,10 +296,13 @@
       try {
         const r = await rpc(ctx, 'wf_triagem_dados', { p_origem_tipo: el.origem_tipo.value, p_origem_id: el.origem_id.value.trim() });
         for (const k of ['cnj', 'cliente', 'natureza', 'pf', 'data_ciencia', 'link_intimacao']) if (r[k]) el[k].value = r[k];
+        if (r.data_disponibilizacao) el.data_recebimento.value = r.data_disponibilizacao;
         if (r.equipe_id) el.equipe_id.value = String(r.equipe_id);
         caixa.dataset.lawsuit = r.atlas_lawsuit_id || ''; caixa.dataset.client = r.atlas_client_id || '';
         dica.textContent = (r.fluxo_ativo ? `Atenção: esta intimação já tem o fluxo #${r.fluxo_ativo} ativo. ` : '')
           + (r.atlas_lawsuit_id ? 'Processo encontrado no Atlas: as tarefas serão vinculadas a ele. ' : 'Processo não encontrado no Atlas: as tarefas sairão sem vínculo com o processo. ')
+          + (r.data_disponibilizacao && r.data_ciencia && r.data_disponibilizacao !== r.data_ciencia
+            ? `Disponibilizada em ${data(r.data_disponibilizacao)}; publicação considerada em ${data(r.data_ciencia)} (1º dia útil seguinte, regra do DJEN). ` : '')
           + (r.resumo ? '' : 'A intimação não trouxe texto.');
         teor.textContent = '';
         if (r.resumo) teor.append(h('details', { class: 'caixa', open: true }, h('summary', {}, h('strong', {}, 'Inteiro teor da intimação')),
@@ -306,20 +315,23 @@
       m.textContent = ''; dica.textContent = '';
       if (!el.data_ciencia.value) { m.textContent = 'Informe a data da publicação ou ciência para sugerir o PF.'; return; }
       try {
-        const r = await rpc(ctx, 'wf_sugerir_pf', { p_modelo: el.modelo.value, p_data_intimacao: el.data_ciencia.value, p_dobro: el.prazo_em_dobro.checked, p_cnj: el.cnj.value.trim() || null });
-        if (r.pf) { el.pf.value = r.pf; el.prazo_legal_dias.value = r.dias; }
-        dica.textContent = r.pf ? `PF sugerido: ${data(r.pf)} (${r.dias} dias úteis${r.tribunal ? ', tribunal ' + r.tribunal : ''}; D-4 ${data(r.d4)}). ${r.aviso}` : (r.mensagem || '');
+        const dias = el.prazo_legal_dias.value ? parseInt(el.prazo_legal_dias.value, 10) : null;
+        const r = await rpc(ctx, 'wf_sugerir_pf', { p_modelo: el.modelo.value, p_data_intimacao: el.data_ciencia.value, p_dobro: el.prazo_em_dobro.checked,
+          p_cnj: el.cnj.value.trim() || null, p_dias: dias });
+        if (r.pf) { el.pf.value = r.pf; el.prazo_legal_dias.value = r.dias_base; }
+        dica.textContent = r.pf ? `PF sugerido: ${data(r.pf)} (${r.dias} dias úteis contados de ${data(r.inicio_contagem)}${r.tribunal ? ', calendário do tribunal ' + r.tribunal : ''}; D-4 ${data(r.d4)}). ${r.aviso}` : (r.mensagem || '');
       } catch (e) { m.textContent = msgErro(e); }
     } }, 'Sugerir PF');
-    el.tem_prazo.addEventListener('change', () => { el.pf.disabled = !el.tem_prazo.checked; el.prazo_legal_dias.disabled = !el.tem_prazo.checked; });
+    el.tem_prazo.addEventListener('change', () => { el.pf.disabled = !el.tem_prazo.checked; el.prazo_legal_dias.disabled = !el.tem_prazo.checked; btSugerir.hidden = !el.tem_prazo.checked; });
     const btCriar = h('button', { type: 'submit', class: 'btn' }, 'Abrir o fluxo');
     caixa.append(h('form', { class: 'cartao', onsubmit: async ev => {
       ev.preventDefault(); m.textContent = '';
       const campos = {
         modelo: el.modelo.value, prazo_em_dobro: el.prazo_em_dobro.checked,
         origem_tipo: el.origem_tipo.value, origem_id: el.origem_id.value.trim() || null, cnj: el.cnj.value.trim(), cliente: el.cliente.value.trim(),
-        equipe_id: el.equipe_id.value, advogado_colaborador_id: el.advogado_colaborador_id.value, natureza: el.natureza.value.trim(),
-        providencia: el.providencia.value.trim(), modalidade_intimacao: el.modalidade_intimacao.value, data_recebimento: el.data_recebimento.value,
+        equipe_id: el.equipe_id.value, advogado_colaborador_id: el.advogado_colaborador_id.value,
+        natureza: linhaNatureza.hidden ? (modeloAtual().nome || el.modelo.value) : el.natureza.value.trim(),
+        providencia: linhaNatureza.hidden ? '' : el.providencia.value.trim(), modalidade_intimacao: el.modalidade_intimacao.value, data_recebimento: el.data_recebimento.value,
         data_ciencia: el.data_ciencia.value, tem_prazo: el.tem_prazo.checked, prazo_legal_dias: el.tem_prazo.checked ? el.prazo_legal_dias.value : '',
         pf: el.tem_prazo.checked ? el.pf.value : '', link_intimacao: el.link_intimacao.value.trim(),
         atlas_lawsuit_id: caixa.dataset.lawsuit || '', atlas_client_id: caixa.dataset.client || '',
@@ -332,11 +344,12 @@
     } },
       h('h2', {}, 'Triagem da intimação'),
       h('p', { class: 'sutil' }, 'Campos obrigatórios da especificação. Com prazo judicial, o fluxo só abre com o PF validado (Regra 04). A mesma intimação não abre dois fluxos ativos (Regra 05).'),
-      h('div', { class: 'filtros-barra' }, campo('Fluxo', el.modelo, true)), caixaDecisao,
-      h('div', { class: 'filtros-barra' }, campo('Origem', el.origem_tipo), campo('Identificador', el.origem_id), btBuscar), dica, teor,
-      h('div', { class: 'filtros-barra' }, campo('Processo (CNJ)', el.cnj), campo('Cliente', el.cliente, true)),
+      // ordem pedida pela controladoria (27/11/2026): origem → processo e cliente → inteiro teor → fluxo
+      h('div', { class: 'filtros-barra' }, campo('Origem', el.origem_tipo), campo('Identificador', el.origem_id), btBuscar), dica,
+      h('div', { class: 'filtros-barra' }, campo('Processo (CNJ)', el.cnj), campo('Cliente no sistema', el.cliente, true)),
+      teor,
+      h('div', { class: 'filtros-barra' }, campo('Fluxo', el.modelo, true)), caixaDecisao, linhaNatureza,
       h('div', { class: 'filtros-barra' }, campo('Equipe', el.equipe_id), campo('Advogado responsável', el.advogado_colaborador_id)),
-      h('div', { class: 'filtros-barra' }, campo('Natureza da intimação', el.natureza), campo('Providência jurídica', el.providencia, true)),
       h('div', { class: 'filtros-barra' }, campo('Modalidade', el.modalidade_intimacao), campo('Recebida em', el.data_recebimento), campo('Publicação ou ciência', el.data_ciencia)),
       h('div', { class: 'filtros-barra' }, h('label', { class: 'filtro-check' }, el.tem_prazo, ' Tem prazo judicial'), h('label', { class: 'filtro-check' }, el.prazo_em_dobro, ' Prazo em dobro'),
         campo('Prazo legal (dias)', el.prazo_legal_dias), campo('Prazo fatal (PF)', el.pf), btSugerir),
