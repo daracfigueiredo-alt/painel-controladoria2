@@ -154,12 +154,17 @@
     // quem pode responder cada pergunta (o banco confere de novo): decisão do líder só o líder da equipe ou a controladoria
     const podeResponder = p => p.quem === 'lider' ? (d.admin || d.lider_do_fluxo) : d.pode_decidir;
     if (pend.length) {
+      // 0069 (28/11/2026): as decisões são registradas no Atlas, pela extensão, na janela da tarefa (o advogado) ou no
+      // aviso de pendências (o líder). Pelo painel, só como exceção: líder ou controladoria, com justificativa.
       const respostas = {};
       const m = h('p', { class: 'erro', 'aria-live': 'polite' });
-      const linhas = pend.map(p => {
+      const excecao = p => p.pendente && podeResponder(p) && (d.admin || d.lider_do_fluxo);
+      const info = pend.map(p => {
         if (!p.pendente) return h('p', { class: 'pergunta' }, `${p.pergunta} `, h('strong', {}, rotuloResposta(p, p.resposta)));
-        if (!podeResponder(p)) return h('p', { class: 'pergunta' }, `${p.pergunta} `,
-          h('span', { class: 'sutil' }, p.quem === 'lider' ? '— aguardando o líder da equipe' : '— aguardando o advogado do fluxo'));
+        return h('p', { class: 'pergunta' }, `${p.pergunta} `, h('span', { class: 'tag tag-alerta' },
+          p.quem === 'lider' ? 'aguardando o líder (no Atlas)' : 'aguardando o advogado (no Atlas)'));
+      });
+      const campos = pend.filter(excecao).map(p => {
         const nome = `wf-${d.id}-${p.chave}`;
         if (p.tipo === 'multipla') {
           const marcados = new Set();
@@ -172,14 +177,20 @@
         const op = (v, t) => h('label', { class: 'opcao' }, h('input', { type: 'radio', name: nome, value: String(v), onchange: () => { respostas[p.chave] = v; } }), ' ', t);
         return h('fieldset', { class: 'pergunta' }, h('legend', {}, p.pergunta + (p.quem === 'lider' ? ' (decisão do líder)' : '')), op(true, 'Sim'), op(false, 'Não'));
       });
-      sec.append(h('div', { class: 'caixa' }, h('p', {}, h('strong', {}, 'Decisões')), ...linhas,
-        pend.some(p => p.pendente && podeResponder(p)) ? h('div', { class: 'acoes' }, h('button', { type: 'button', class: 'btn', onclick: async ev => {
-          m.textContent = '';
-          if (!Object.keys(respostas).length) { m.textContent = 'Responda pelo menos uma pergunta.'; return; }
-          ev.target.disabled = true;
-          try { await rpc(ctx, 'wf_decidir', { p_instancia: d.id, p_respostas: respostas, p_nota: null }); recarregar(); }
-          catch (e) { m.textContent = msgErro(e); ev.target.disabled = false; }
-        } }, 'Registrar decisões')) : null, m));
+      const just = h('input', { type: 'text', minlength: 15, maxlength: 500, placeholder: 'Por que a decisão está sendo registrada pelo painel (mínimo de 15 caracteres)' });
+      sec.append(h('div', { class: 'caixa' }, h('p', {}, h('strong', {}, 'Decisões')), ...info,
+        pend.some(p => p.pendente) ? h('p', { class: 'nota wf-nota-larga' }, 'O advogado responde no Atlas, na janela da tarefa (extensão da controladoria). '
+          + 'Se ele concluir a tarefa sem responder, o líder da equipe recebe o aviso no Atlas e a falta aparece no double check.') : null,
+        campos.length ? h('details', {}, h('summary', {}, 'Responder pelo painel (exceção)'), ...campos,
+          h('div', { class: 'filtros-barra' }, campo('Justificativa', just, true)),
+          h('div', { class: 'acoes' }, h('button', { type: 'button', class: 'btn', onclick: async ev => {
+            m.textContent = '';
+            if (!Object.keys(respostas).length) { m.textContent = 'Responda pelo menos uma pergunta.'; return; }
+            if (just.value.trim().length < 15) { m.textContent = 'Escreva a justificativa (mínimo de 15 caracteres).'; return; }
+            ev.target.disabled = true;
+            try { await rpc(ctx, 'wf_decidir', { p_instancia: d.id, p_respostas: respostas, p_nota: 'Pelo painel (exceção): ' + just.value.trim() }); recarregar(); }
+            catch (e) { m.textContent = msgErro(e); ev.target.disabled = false; }
+          } }, 'Registrar decisões')), m) : null));
     }
     // etapas que não se aplicam (dispensadas pelas decisões) ficam recolhidas numa linha
     const naoAplicam = (d.etapas || []).filter(e => e.status === 'dispensada' && !e.filho);

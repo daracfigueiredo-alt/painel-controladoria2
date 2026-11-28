@@ -398,3 +398,5 @@ button.tag-botao:hover { text-decoration: underline; text-underline-offset: 2px;
 .wf-triagem .filtro select { min-width: 12rem; }
 .wf-triagem .wf-bloco > .erro { flex: 1 0 100%; margin: 0; }
 .wf-triagem .wf-bloco > .erro:empty { display: none; }
+/* Workflows: nota explicativa no detalhe do fluxo em largura confortável */
+.nota.wf-nota-larga { max-width: 75ch; font-size: .88rem; line-height: 1.5; padding: .5rem .75rem; border-left: 3px solid var(--ouro); background: var(--fundo); border-radius: 0 6px 6px 0; }
