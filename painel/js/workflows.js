@@ -240,7 +240,8 @@
   // ------------------------------------------------------------ triagem (seção 1.2 da especificação)
   // pre (0065, 27/11/2026): { origem_tipo, origem_id } quando a triagem nasce de uma intimação da lista (CNJ ou Webjur):
   // a origem já vem escolhida e os dados são buscados sozinhos.
-  async function formTriagem(caixa, ctx, aoCriar, pre) {
+  // aoSemPrazo (0068): chamada quando a controladoria registra que a intimação não tem prazo para manifestação
+  async function formTriagem(caixa, ctx, aoCriar, pre, aoSemPrazo) {
     let cfg;
     try { cfg = await rpc(ctx, 'wf_configuracao'); } catch (e) { caixa.append(aviso('erro', msgErro(e))); return; }
     const sel = (lista, rot) => h('select', {}, h('option', { value: '' }, rot), lista.map(x => h('option', { value: x.id }, x.nome)));
@@ -325,6 +326,29 @@
     } }, 'Sugerir PF');
     el.tem_prazo.addEventListener('change', () => { el.pf.disabled = !el.tem_prazo.checked; el.prazo_legal_dias.disabled = !el.tem_prazo.checked; btSugerir.hidden = !el.tem_prazo.checked; });
     const btCriar = h('button', { type: 'submit', class: 'btn' }, 'Abrir o fluxo');
+    // 0068: intimação sem prazo para manifestação → tratada sem workflow e, no CNJ, arquivada
+    const semPrazo = h('input', { type: 'checkbox' }), motivoSemPrazo = h('input', { type: 'text', maxlength: 500, placeholder: 'Ex.: mera ciência de juntada; ato ordinatório sem determinação à parte' });
+    const notaSem = h('p', { class: 'wf-dica' });
+    const blocoFluxo = h('div'), mSem = h('p', { class: 'erro', 'aria-live': 'polite' });
+    const btSemPrazo = h('button', { type: 'button', class: 'btn', onclick: async () => {
+      mSem.textContent = '';
+      if (el.origem_tipo.value === 'manual' || !el.origem_id.value.trim()) { mSem.textContent = 'Escolha a origem e o identificador da intimação.'; return; }
+      btSemPrazo.disabled = true;
+      try {
+        const r = await rpc(ctx, 'wf_tratar_sem_prazo', { p_origem_tipo: el.origem_tipo.value, p_origem_id: el.origem_id.value.trim(), p_motivo: motivoSemPrazo.value.trim() || null });
+        if (aoSemPrazo) aoSemPrazo(r); else { caixa.textContent = ''; caixa.append(aviso('ok', 'Intimação registrada como sem prazo para manifestação' + (r.arquivada ? ' e arquivada.' : '.'))); }
+      } catch (e) { mSem.textContent = msgErro(e); btSemPrazo.disabled = false; }
+    } }, 'Registrar sem prazo e arquivar');
+    const blocoSemPrazo = h('div', { class: 'filtros-barra wf-bloco', hidden: true },
+      notaSem, campo('Observação (opcional)', motivoSemPrazo, true), btSemPrazo, mSem);
+    const linhaSemPrazo = h('div', { class: 'filtros-barra' }, h('label', { class: 'filtro-check' }, semPrazo, ' ', h('strong', {}, 'Não há prazo para manifestação'), ' (não abre fluxo; a intimação é arquivada)'));
+    semPrazo.addEventListener('change', () => { blocoFluxo.hidden = semPrazo.checked; blocoSemPrazo.hidden = !semPrazo.checked; });
+    const atualizaSemPrazo = () => {
+      notaSem.textContent = el.origem_tipo.value === 'cnj'
+        ? 'A intimação fica tratada sem abrir workflow e sai da lista de pendentes (vai para "Arquivadas"). Dá para desfazer depois, com justificativa.'
+        : 'A intimação fica marcada como tratada, sem abrir workflow ("Sem prazo · tratada" na lista). Dá para desfazer depois, com justificativa.';
+      linhaSemPrazo.hidden = el.origem_tipo.value === 'manual'; if (linhaSemPrazo.hidden && semPrazo.checked) { semPrazo.checked = false; semPrazo.dispatchEvent(new Event('change')); } };
+    el.origem_tipo.addEventListener('change', atualizaSemPrazo);
     caixa.append(h('form', { class: 'cartao wf-triagem', onsubmit: async ev => {
       ev.preventDefault(); m.textContent = '';
       const campos = {
@@ -348,7 +372,8 @@
       // ordem pedida pela controladoria (27/11/2026): origem → processo e cliente → inteiro teor → fluxo
       h('div', { class: 'filtros-barra' }, campo('Origem', el.origem_tipo), campo('Identificador', el.origem_id), btBuscar), dica,
       h('div', { class: 'filtros-barra' }, campo('Processo (CNJ)', el.cnj), campo('Cliente no sistema', el.cliente, true)),
-      teor,
+      teor, linhaSemPrazo, blocoSemPrazo, blocoFluxo));
+    blocoFluxo.append(
       h('div', { class: 'filtros-barra' }, campo('Fluxo', el.modelo, true)), caixaDecisao, linhaNatureza,
       h('div', { class: 'filtros-barra' }, campo('Equipe', el.equipe_id), campo('Advogado responsável', el.advogado_colaborador_id)),
       h('div', { class: 'filtros-barra' }, campo('Modalidade', el.modalidade_intimacao), campo('Recebida em', el.data_recebimento), campo('Publicação ou ciência', el.data_ciencia)),
@@ -357,12 +382,13 @@
       h('div', { class: 'filtros-barra' }, campo('Link da intimação', el.link_intimacao, true)),
       h('div', { class: 'filtros-barra' }, campo('Motivo da comunicação', el.motivo, true), campo('Finalidade dos documentos', el.finalidade, true)),
       h('p', {}, h('strong', {}, 'Decisões já conhecidas na triagem (opcional)')), caixaPerg,
-      h('div', { class: 'acoes' }, btCriar), m));
-    trocarModelo();
+      h('div', { class: 'acoes' }, btCriar), m);
+    trocarModelo(); atualizaSemPrazo();
     if (pre && pre.origem_tipo && pre.origem_id) {
       el.origem_tipo.value = pre.origem_tipo; el.origem_id.value = String(pre.origem_id);
       el.origem_tipo.disabled = true; el.origem_id.readOnly = true;
       if (pre.modalidade) el.modalidade_intimacao.value = pre.modalidade;
+      atualizaSemPrazo();
       btBuscar.click();
     }
   }
@@ -383,7 +409,34 @@
         h('div', { class: 'acoes' }, h('button', { type: 'button', class: 'btn', onclick: () => { dlgTratar.close(); abrirFluxo(id); } }, 'Ver o fluxo'),
           h('button', { type: 'button', class: 'btn btn-sec', onclick: () => dlgTratar.close() }, 'Continuar na lista')));
       if (aoCriar) aoCriar(id);
-    }, pre);
+    }, pre, r => {
+      corpo.textContent = '';
+      corpo.append(aviso('ok', 'Intimação registrada como sem prazo para manifestação' + (r.arquivada ? ' e arquivada (está em "Arquivadas").' : '.')),
+        h('div', { class: 'acoes' }, h('button', { type: 'button', class: 'btn', onclick: () => dlgTratar.close() }, 'Continuar na lista')));
+      if (aoCriar) aoCriar(null);
+    });
+  }
+
+  // 0068: ver e desfazer o registro "sem prazo para manifestação"
+  function verSemPrazo(ctx, t, pre, admin, aoMudar) {
+    if (!dlgTratar) { dlgTratar = h('dialog', { class: 'detalhe', 'aria-labelledby': 'wf-tratar-titulo' }); document.body.append(dlgTratar); }
+    dlgTratar.textContent = '';
+    const corpo = h('div', { class: 'detalhe-corpo' }), just = h('input', { type: 'text', minlength: 15, maxlength: 500, placeholder: 'Por que a intimação tem prazo, afinal (mínimo de 15 caracteres)' });
+    const msg = h('p', { class: 'erro', 'aria-live': 'polite' });
+    corpo.append(h('p', {}, `Registrada como sem prazo para manifestação em ${dataHora(t.em)}` + (t.por ? ` por ${t.por}` : '') + (t.motivo ? `: ${t.motivo}` : '.')));
+    if (admin) corpo.append(h('div', { class: 'caixa' }, h('strong', {}, 'Desfazer'),
+      h('p', { class: 'nota' }, 'A intimação volta para a lista de pendentes (no CNJ, é desarquivada) e pode ser tratada com um fluxo.'),
+      h('div', { class: 'filtros-barra' }, campo('Justificativa', just, true)),
+      h('div', { class: 'acoes' }, h('button', { type: 'button', class: 'btn btn-sec', onclick: async () => {
+        msg.textContent = '';
+        try { await rpc(ctx, 'wf_desfazer_sem_prazo', { p_origem_tipo: pre.origem_tipo, p_origem_id: String(pre.origem_id), p_motivo: just.value.trim() });
+          dlgTratar.close(); if (aoMudar) aoMudar(); }
+        catch (e) { msg.textContent = msgErro(e); }
+      } }, 'Desfazer o registro')), msg));
+    dlgTratar.append(h('div', { class: 'detalhe-topo' },
+      h('div', {}, h('h2', { id: 'wf-tratar-titulo' }, 'Sem prazo para manifestação'), h('p', { class: 'sutil' }, pre.titulo || '')),
+      h('button', { type: 'button', class: 'btn btn-sec btn-peq', onclick: () => dlgTratar.close() }, 'Fechar')), corpo);
+    dlgTratar.showModal();
   }
 
   // abre a área de Workflows já no detalhe de um fluxo
@@ -398,6 +451,9 @@
   }
   // célula "Tratamento" das listas de intimações
   function celulaTratamento(ctx, fluxo, pre, admin, aoCriar) {
+    if (fluxo && fluxo.sem_prazo) return h('button', { type: 'button', class: 'tag tag-botao tag-neutra', title: fluxo.motivo || 'Sem prazo para manifestação',
+      onclick: () => verSemPrazo(ctx, fluxo, pre, admin, aoCriar) }, 'Sem prazo · tratada');
+    if (!fluxo && pre.arquivada) return h('span', { class: 'tag tag-neutra' }, 'Arquivada');
     if (fluxo) return h('button', { type: 'button', class: 'tag tag-botao ' + (fluxo.status === 'ativo' ? 'tag-ok' : 'tag-neutra'), title: fluxo.modelo || '',
       onclick: () => abrirFluxo(fluxo.id) }, `Fluxo #${fluxo.id} · ${FLUXO[fluxo.status] || fluxo.status}`);
     if (!admin) return h('span', { class: 'tag tag-alerta' }, 'Sem tratamento');

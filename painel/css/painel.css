@@ -396,3 +396,5 @@ button.tag-botao:hover { text-decoration: underline; text-underline-offset: 2px;
 .wf-triagem .wf-dica strong { color: var(--texto); }
 .wf-triagem .filtros-barra > .btn { min-height: 2.35rem; }
 .wf-triagem .filtro select { min-width: 12rem; }
+.wf-triagem .wf-bloco > .erro { flex: 1 0 100%; margin: 0; }
+.wf-triagem .wf-bloco > .erro:empty { display: none; }

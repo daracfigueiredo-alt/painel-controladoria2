@@ -125,7 +125,7 @@
         { titulo: 'Tipo', valor: i => [i.tipo, i.documento].filter(Boolean).join(' · ') },
         { titulo: 'Tratamento', valor: i => window.Workflows.celulaTratamento(ctx, fluxos[String(i.id)], {
             origem_tipo: 'cnj', origem_id: i.id, modalidade: 'DJEN',
-            titulo: [i.cnj, data(i.data_disponibilizacao), [i.tipo, i.documento].filter(Boolean).join(' · ')].filter(Boolean).join(' — ') }, admin && !i.arquivada, () => desenhar()) },
+            titulo: [i.cnj, data(i.data_disponibilizacao), [i.tipo, i.documento].filter(Boolean).join(' · ')].filter(Boolean).join(' — '), arquivada: !!i.arquivada }, admin, () => desenhar()) },
         { titulo: 'Atlas', valor: tagAtlas },
         { titulo: 'Webjur', valor: i => i.webjur ? h('span', { class: 'tag tag-ok' }, i.webjur.exata ? 'Capturada' : 'Capturada (processo e data)')
                                                 : h('span', { class: 'tag tag-erro' }, 'Não capturada') },
